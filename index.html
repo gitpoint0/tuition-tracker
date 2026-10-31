@@ -12,52 +12,78 @@
   <div>
     <h1 id="navTitle" class="text-base font-bold">📚 Smart Tuition Tracker</h1>
     <div class="flex items-center gap-2">
-      <p id="modeText" class="text-[11px] text-indigo-200">Mode: Admin (Unlocked 🔓)</p>
-      <span id="cloudStatus" class="text-[10px] bg-indigo-800 px-2 py-0.5 rounded-full text-amber-300">⏳ Connecting Cloud...</span>
+      <p id="modeText" class="text-[11px] text-indigo-200">Mode: Parent View (Read-Only 👁️)</p>
+      <span id="cloudStatus" class="text-[10px] bg-indigo-800 px-2 py-0.5 rounded-full text-amber-300">⏳ Connecting...</span>
     </div>
   </div>
   <button onclick="handleRoleSwitch()" id="roleBtn" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-400">
-    Lock Parent View 🔒
+    Admin Unlock 🔑
   </button>
 </nav>
 
 <div class="max-w-xl mx-auto p-3 mt-1">
   <div id="msgBox" class="hidden mb-3 p-2.5 rounded-lg bg-emerald-600 text-white text-xs font-bold text-center"></div>
 
-  <div id="adminPanel" class="space-y-3 mb-5">
-    <!-- Settings -->
-    <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
-      <div onclick="toggleBox('settingsBody')" class="flex justify-between items-center cursor-pointer">
-        <span class="text-xs font-bold text-indigo-400">⚙️ Tuition, UPI & PIN Settings</span>
-        <span class="text-xs text-slate-400">Open ▼</span>
-      </div>
-      <div id="settingsBody" class="hidden mt-3 pt-3 border-t border-slate-700 space-y-2">
-        <input id="setTuition" placeholder="Tuition Name" class="bg-slate-700 text-white p-2 rounded-lg text-xs w-full">
-        <input id="setUpi" placeholder="Your UPI ID (e.g. 9876543210@ybl)" class="bg-slate-700 text-white p-2 rounded-lg text-xs w-full">
-        <input id="setPin" placeholder="Admin PIN (Default: 1234)" class="bg-slate-700 text-white p-2 rounded-lg text-xs w-full">
-        <button onclick="saveSettings()" class="bg-indigo-600 text-white rounded-lg p-2 text-xs font-bold w-full">💾 Save Settings</button>
-      </div>
+  <!-- Direct Student View Card (Jab parent direct link kholein) -->
+  <div id="singleParentCard" class="hidden bg-slate-800 border border-indigo-500/50 p-5 rounded-2xl shadow-xl text-center space-y-4 mb-5">
+    <div>
+      <span class="text-[11px] bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Fee Invoice</span>
+      <h2 id="spName" class="text-xl font-bold text-white mt-2"></h2>
+      <p id="spDueText" class="text-sm text-slate-400 mt-1">Pending Tuition Fee</p>
+    </div>
+    
+    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+      <p class="text-xs text-slate-400">Total Due Amount</p>
+      <p id="spDueAmt" class="text-3xl font-extrabold text-red-400 mt-1"></p>
     </div>
 
-    <!-- Add Student -->
-    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-2.5">
-      <h2 class="text-sm font-bold text-white">➕ Add New Student</h2>
-      <input id="stuName" placeholder="Student Name (e.g. Rajkishor Kumar)" class="bg-slate-700 border border-slate-600 text-white p-2.5 rounded-lg text-sm w-full">
-      <input id="stuPhone" type="tel" placeholder="Parent WhatsApp No. (Optional)" class="bg-slate-700 border border-slate-600 text-white p-2.5 rounded-lg text-sm w-full">
-      <div class="grid grid-cols-2 gap-2">
-        <input id="joinDate" type="date" class="bg-slate-700 border border-slate-600 text-white p-2.5 rounded-lg text-sm w-full">
-        <input id="monthlyFee" type="number" placeholder="Fee (₹)" class="bg-slate-700 border border-slate-600 text-white p-2.5 rounded-lg text-sm w-full">
-      </div>
-      <button onclick="addStudent()" class="bg-indigo-600 active:bg-indigo-800 text-white rounded-lg p-2.5 text-sm font-bold w-full">
-        Save Student Profile
-      </button>
+    <a id="spUpiBtn" href="#" class="block w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-emerald-900/40">
+      💳 Pay via UPI (PhonePe / GPay / Paytm)
+    </a>
+
+    <div class="pt-2 border-t border-slate-700/60 text-left">
+      <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Recent Payments</h4>
+      <ul id="spHistory" class="space-y-1.5 text-xs"></ul>
     </div>
   </div>
 
-  <input oninput="renderList()" id="searchBox" placeholder="🔍 Search student by name..." class="bg-slate-800 border border-slate-700 text-white p-2.5 rounded-xl text-sm w-full mb-3">
+  <!-- Admin & General Directory View -->
+  <div id="generalPortalArea">
+    <div id="adminPanel" class="hidden space-y-3 mb-5">
+      <!-- Settings -->
+      <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+        <div onclick="toggleBox('settingsBody')" class="flex justify-between items-center cursor-pointer">
+          <span class="text-xs font-bold text-indigo-400">⚙️ Tuition, UPI & PIN Settings</span>
+          <span class="text-xs text-slate-400">Open ▼</span>
+        </div>
+        <div id="settingsBody" class="hidden mt-3 pt-3 border-t border-slate-700 space-y-2">
+          <input id="setTuition" placeholder="Tuition Name" class="bg-slate-700 text-white p-2 rounded-lg text-xs w-full">
+          <input id="setUpi" placeholder="Your UPI ID (e.g. 9876543210@ybl)" class="bg-slate-700 text-white p-2 rounded-lg text-xs w-full">
+          <input id="setPin" placeholder="Admin PIN (Default: 1234)" class="bg-slate-700 text-white p-2 rounded-lg text-xs w-full">
+          <button onclick="saveSettings()" class="bg-indigo-600 text-white rounded-lg p-2 text-xs font-bold w-full">💾 Save Settings</button>
+        </div>
+      </div>
 
-  <h2 class="text-sm font-bold mb-2 text-slate-300">👨‍🎓 Students Profiles & Fee Status</h2>
-  <div id="studentList" class="space-y-2.5"></div>
+      <!-- Add Student -->
+      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-2.5">
+        <h2 class="text-sm font-bold text-white">➕ Add New Student</h2>
+        <input id="stuName" placeholder="Student Name (e.g. Rajkishor Kumar)" class="bg-slate-700 border border-slate-600 text-white p-2.5 rounded-lg text-sm w-full">
+        <input id="stuPhone" type="tel" placeholder="Parent WhatsApp No. (Optional)" class="bg-slate-700 border border-slate-600 text-white p-2.5 rounded-lg text-sm w-full">
+        <div class="grid grid-cols-2 gap-2">
+          <input id="joinDate" type="date" class="bg-slate-700 border border-slate-600 text-white p-2.5 rounded-lg text-sm w-full">
+          <input id="monthlyFee" type="number" placeholder="Fee (₹)" class="bg-slate-700 border border-slate-600 text-white p-2.5 rounded-lg text-sm w-full">
+        </div>
+        <button onclick="addStudent()" class="bg-indigo-600 active:bg-indigo-800 text-white rounded-lg p-2.5 text-sm font-bold w-full">
+          Save Student Profile
+        </button>
+      </div>
+    </div>
+
+    <input oninput="renderList()" id="searchBox" placeholder="🔍 Search student by name..." class="bg-slate-800 border border-slate-700 text-white p-2.5 rounded-xl text-sm w-full mb-3">
+
+    <h2 class="text-sm font-bold mb-2 text-slate-300">👨‍🎓 Students Profiles & Fee Status</h2>
+    <div id="studentList" class="space-y-2.5"></div>
+  </div>
 </div>
 
 <!-- PIN Modal -->
@@ -73,13 +99,13 @@
   </div>
 </div>
 
-<!-- Profile Modal -->
+<!-- Profile Modal (Admin View) -->
 <div id="profileModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-3 z-20">
   <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-4 max-h-[90vh] overflow-y-auto">
     <div class="flex justify-between items-start border-b border-slate-700 pb-2.5">
       <div>
         <h3 id="mName" class="text-lg font-bold text-white"></h3>
-        <p id="mJoin" class="text-xs text-slate-400"></p>
+        <p id="mFeeSummary" class="text-xs text-slate-400"></p>
       </div>
       <button onclick="toggleBox('profileModal')" class="text-slate-400 text-lg font-bold px-2">✕</button>
     </div>
@@ -99,7 +125,7 @@
         </div>
       </div>
       <button onclick="sendWhatsApp()" class="w-full bg-green-600 text-white py-2.5 rounded-xl font-bold text-xs">
-        📲 Send WhatsApp Fee Reminder
+        📲 Send WhatsApp Fee Reminder (Private Link)
       </button>
     </div>
 
@@ -135,62 +161,83 @@
 
   let db = {
     settings: { name: "Smart Tuition Tracker", upi: "yourname@ybl", pin: "1234" },
-    students: [
-      { id: 1, name: "Rajkishor Kumar", phone: "", joinDate: "2024-12-01", fee: 500, payments: [
-        { amount: 500, time: "05 Dec 2024, 04:30 PM" },
-        { amount: 500, time: "30 Oct 2026, 09:39 PM" }
-      ]}
-    ]
+    students: []
   };
 
-  try {
-    let saved = localStorage.getItem('tuition_v4');
-    if (saved) db = JSON.parse(saved);
-  } catch(e) {}
+  // Hamesha locked Parent View se start hoga security ke liye
+  let isAdmin = false, activeId = null;
 
-  let isAdmin = true, activeId = null;
+  const urlParams = new URLSearchParams(window.location.search);
+  const requestedStudentId = urlParams.get('student');
 
-  // Real-Time Cloud Listener
   onSnapshot(docRef, (snap) => {
     const statusBadge = document.getElementById('cloudStatus');
     if (snap.exists()) {
       db = snap.data();
-      try { localStorage.setItem('tuition_v4', JSON.stringify(db)); } catch(e) {}
       statusBadge.innerText = "☁️ Cloud Live";
       statusBadge.className = "text-[10px] bg-emerald-900/80 px-2 py-0.5 rounded-full text-emerald-300 font-bold";
       updateUI();
     } else {
-      // Pehli baar local data ko cloud par upload karein
-      setDoc(docRef, db).then(() => {
-        statusBadge.innerText = "☁️ Cloud Synced";
-      });
+      setDoc(docRef, db).then(() => { statusBadge.innerText = "☁️ Cloud Synced"; });
     }
   }, (err) => {
-    console.error("Firebase Error:", err);
+    console.error(err);
     document.getElementById('cloudStatus').innerText = "⚠️ Offline Mode";
   });
 
   function updateUI() {
-    document.getElementById('navTitle').innerText = "📚 " + db.settings.name;
-    document.getElementById('setTuition').value = db.settings.name;
-    document.getElementById('setUpi').value = db.settings.upi;
-    document.getElementById('setPin').value = db.settings.pin;
-    renderList();
-    if (activeId && !document.getElementById('profileModal').classList.contains('hidden')) {
-      let exists = db.students.some(x => x.id === activeId);
-      if (exists) window.openProfile(activeId);
-      else window.toggleBox('profileModal');
+    document.getElementById('navTitle').innerText = "📚 " + (db.settings.name || "Smart Tuition Tracker");
+    document.getElementById('setTuition').value = db.settings.name || "";
+    document.getElementById('setUpi').value = db.settings.upi || "";
+    document.getElementById('setPin').value = db.settings.pin || "1234";
+
+    // Agar direct student link khola gaya hai
+    if (requestedStudentId && !isAdmin) {
+      let st = (db.students || []).find(x => String(x.id) === String(requestedStudentId));
+      if (st) {
+        showPrivateStudentCard(st);
+        return;
+      }
     }
+
+    document.getElementById('singleParentCard').classList.add('hidden');
+    document.getElementById('generalPortalArea').classList.remove('hidden');
+    renderList();
+  }
+
+  function showPrivateStudentCard(s) {
+    document.getElementById('generalPortalArea').classList.add('hidden');
+    const card = document.getElementById('singleParentCard');
+    card.classList.remove('hidden');
+
+    let { due } = calcFee(s);
+    document.getElementById('spName').innerText = s.name;
+    document.getElementById('spDueAmt').innerText = `₹${due}`;
+
+    let upiBtn = document.getElementById('spUpiBtn');
+    if (due > 0) {
+      upiBtn.href = `upi://pay?pa=${db.settings.upi}&pn=${encodeURIComponent(db.settings.name)}&am=${due}&cu=INR`;
+      upiBtn.innerText = `💳 Pay Due ₹${due} via UPI`;
+      upiBtn.classList.remove('pointer-events-none', 'opacity-50');
+    } else {
+      upiBtn.href = "#";
+      upiBtn.innerText = `✅ All Fees Cleared (₹0 Due)`;
+      upiBtn.classList.add('pointer-events-none', 'opacity-50');
+    }
+
+    let h = document.getElementById('spHistory');
+    h.innerHTML = (s.payments && s.payments.length) ? s.payments.slice().reverse().map(p => 
+      `<li class="flex justify-between bg-slate-900 p-2 rounded border border-slate-700/60"><b class="text-emerald-400">+ ₹${p.amount}</b><span class="text-slate-400">${p.time}</span></li>`
+    ).join('') : `<li class="text-slate-500 italic">No past payment records.</li>`;
   }
 
   async function saveDb() {
-    try { localStorage.setItem('tuition_v4', JSON.stringify(db)); } catch(e) {}
     updateUI();
     try {
       await setDoc(docRef, db);
     } catch(e) {
-      console.error("Cloud Save Error:", e);
-      msg("⚠️ Local saved, Cloud error!");
+      console.error(e);
+      msg("⚠️ Cloud Save Error!");
     }
   }
 
@@ -218,14 +265,14 @@
     let q = document.getElementById('searchBox').value.toLowerCase();
     box.innerHTML = '';
     (db.students || []).filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
-      let { m, paid, due } = calcFee(s);
+      let { due } = calcFee(s);
       let badge = due > 0 ? `<span class="bg-red-500/20 text-red-300 text-xs font-bold px-2 py-1 rounded-full">Due: ₹${due}</span>`
                           : `<span class="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-2 py-1 rounded-full">Clear ₹0</span>`;
       box.innerHTML += `
         <div onclick="openProfile(${s.id})" class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex justify-between items-center cursor-pointer">
           <div>
             <h3 class="font-bold text-white text-sm">${s.name}</h3>
-            <p class="text-[11px] text-slate-400">Joined: ${s.joinDate} (${m} Mo) • Fee: ₹${s.fee}</p>
+            <p class="text-[11px] text-slate-400">Monthly Fee: ₹${s.fee}</p>
           </div>
           <div class="text-right">${badge}<p class="text-[11px] text-indigo-400 font-bold mt-1">Open →</p></div>
         </div>`;
@@ -242,16 +289,16 @@
     document.getElementById('stuName').value = '';
     document.getElementById('stuPhone').value = '';
     document.getElementById('monthlyFee').value = '';
-    saveDb(); msg("☁️ Student Cloud Par Save Ho Gaya!");
+    saveDb(); msg("☁️ Student Saved!");
   };
 
   window.openProfile = function(id) {
     activeId = id;
     let s = db.students.find(x => x.id === id);
     if (!s) return;
-    let { m, paid, due } = calcFee(s);
+    let { paid, due } = calcFee(s);
     document.getElementById('mName').innerText = s.name;
-    document.getElementById('mJoin').innerText = `Joined: ${s.joinDate} • ${m} Months Billed`;
+    document.getElementById('mFeeSummary').innerText = `Fee: ₹${s.fee} / month`;
     document.getElementById('mFee').innerText = `₹${s.fee}`;
     document.getElementById('mPaid').innerText = `₹${paid}`;
     document.getElementById('mDue').innerText = `₹${due}`;
@@ -277,31 +324,33 @@
     if (!s.payments) s.payments = [];
     s.payments.push({ amount: amt, time });
     document.getElementById('payAmt').value = '';
-    saveDb(); window.openProfile(activeId); msg("☁️ Payment Cloud Par Update Ho Gayi!");
+    saveDb(); window.openProfile(activeId); msg("☁️ Payment Updated!");
   };
 
-    window.sendWhatsApp = function() {
+  window.sendWhatsApp = function() {
     let s = db.students.find(x => x.id === activeId);
     let { due } = calcFee(s);
-    let appLink = window.location.origin; 
+    
+    // Har student ka unique secret direct invoice link
+    let directPayLink = `${window.location.origin}${window.location.pathname}?student=${s.id}`;
 
-    let text = `Namaste 🙏\n\n*${s.name}* ki pending tuition fee *₹${due}* hai.\n\nKripya is link par click karein aur seedhe UPI (PhonePe/GPay) se payment karein 👇\n\n🔗 ${appLink}`;
+    let text = `Namaste 🙏\n\n*${s.name}* ki pending tuition fee *₹${due}* hai.\n\nKripya is link par click karke seedhe PhonePe/GPay se payment karein 👇\n\n🔗 ${directPayLink}`;
 
     let ph = (s.phone || "").replace(/\D/g, '');
     let url = (ph.length === 10 ? `https://wa.me/91${ph}` : `https://wa.me/`) + `?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
-  
+
   window.deleteStu = function() {
     db.students = db.students.filter(x => x.id !== activeId);
-    saveDb(); window.toggleBox('profileModal'); msg("🗑️ Profile Deleted from Cloud!");
+    saveDb(); window.toggleBox('profileModal'); msg("🗑️ Profile Deleted!");
   };
 
   window.saveSettings = function() {
     db.settings.name = document.getElementById('setTuition').value.trim() || db.settings.name;
     db.settings.upi = document.getElementById('setUpi').value.trim() || db.settings.upi;
     db.settings.pin = document.getElementById('setPin').value.trim() || "1234";
-    saveDb(); window.toggleBox('settingsBody'); msg("☁️ Settings Cloud Par Save Ho Gayi!");
+    saveDb(); window.toggleBox('settingsBody'); msg("☁️ Settings Saved!");
   };
 
   window.handleRoleSwitch = function() {
@@ -310,9 +359,9 @@
   };
 
   window.verifyPin = function() {
-    if (document.getElementById('pinInput').value === db.settings.pin) {
+    if (document.getElementById('pinInput').value === (db.settings.pin || "1234")) {
       setRole(true); window.toggleBox('pinModal'); msg("🔓 Admin Unlocked!");
-    } else msg("❌ Wrong PIN! (Default: 1234)");
+    } else msg("❌ Wrong PIN!");
   };
 
   function setRole(admin) {
@@ -322,9 +371,11 @@
     document.getElementById('delBox').classList.toggle('hidden', !admin);
     document.getElementById('modeText').innerText = admin ? "Mode: Admin (Unlocked 🔓)" : "Mode: Parent View (Read-Only 👁️)";
     document.getElementById('roleBtn').innerText = admin ? "Lock Parent View 🔒" : "Admin Unlock 🔑";
+    updateUI();
   }
 
-  updateUI();
+  // Pehli baar load hone par Parent View lock rahega
+  setRole(false);
 </script>
 </body>
 </html>
