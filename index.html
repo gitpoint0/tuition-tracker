@@ -5,139 +5,219 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Tuition Tracker</title>
 <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans pb-12">
+<style>
+  body {
+    background: #090d16;
+    overflow-x: hidden;
+  }
+  /* 3D Animated Background Blobs */
+  .bg-blob-1 {
+    position: fixed; top: -10%; left: -10%; width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(59,130,246,0.5) 0%, rgba(37,99,235,0) 70%);
+    border-radius: 50%; filter: blur(30px); z-index: -1;
+    animation: floatBlob 8s infinite alternate ease-in-out;
+  }
+  .bg-blob-2 {
+    position: fixed; bottom: -10%; right: -10%; width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(147,51,234,0.45) 0%, rgba(126,34,206,0) 70%);
+    border-radius: 50%; filter: blur(35px); z-index: -1;
+    animation: floatBlob 10s infinite alternate-reverse ease-in-out;
+  }
+  @keyframes floatBlob {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, 50px) scale(1.15); }
+  }
 
-<nav class="bg-indigo-600 text-white p-3.5 shadow flex justify-between items-center sticky top-0 z-10">
+  /* Glassmorphism Styles */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  }
+  .glass-input {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
+  }
+  .glass-input:focus {
+    outline: none;
+    border-color: rgba(96, 165, 250, 0.6);
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .glass-nav {
+    background: rgba(9, 13, 22, 0.75);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Smooth Entry & Pulse Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .animate-card {
+    animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes popModal {
+    0% { opacity: 0; transform: scale(0.85); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  .animate-modal {
+    animation: popModal 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 15px rgba(37, 99, 235, 0.4); }
+    50% { box-shadow: 0 0 28px rgba(59, 130, 246, 0.8); }
+  }
+  .glow-btn {
+    animation: pulseGlow 2.2s infinite;
+  }
+</style>
+</head>
+<body class="text-slate-100 min-h-screen font-sans pb-12">
+
+<!-- 3D Floating Background Spheres -->
+<div class="bg-blob-1"></div>
+<div class="bg-blob-2"></div>
+
+<nav class="glass-nav p-3.5 shadow-lg flex justify-between items-center sticky top-0 z-10">
   <div>
-    <h1 id="navTitle" class="text-base font-bold">📚 Smart Tuition Tracker</h1>
-    <div class="flex items-center gap-2">
-      <p id="modeText" class="text-[11px] text-indigo-200">Mode: Parent View (Read-Only 👁️)</p>
-      <span id="cloudStatus" class="text-[10px] bg-indigo-800 px-2 py-0.5 rounded-full text-amber-300">⏳ Connecting...</span>
+    <h1 id="navTitle" class="text-base font-bold text-white tracking-wide">📚 Smart Tuition Tracker</h1>
+    <div class="flex items-center gap-2 mt-0.5">
+      <p id="modeText" class="text-[11px] text-blue-300">Mode: Parent View (Read-Only 👁️)</p>
+      <span id="cloudStatus" class="text-[9px] bg-white/10 px-2 py-0.5 rounded-full text-blue-200 border border-white/10">⏳ Connecting...</span>
     </div>
   </div>
-  <button onclick="handleRoleSwitch()" id="roleBtn" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-400">
+  <button onclick="handleRoleSwitch()" id="roleBtn" class="bg-white/10 hover:bg-white/20 active:scale-90 text-white px-3 py-1.5 rounded-xl text-xs font-bold border border-white/15 transition-all">
     Admin Unlock 🔑
   </button>
 </nav>
 
-<div class="max-w-xl mx-auto p-3 mt-1">
-  <div id="msgBox" class="hidden mb-3 p-2.5 rounded-lg bg-emerald-600 text-white text-xs font-bold text-center"></div>
+<div class="max-w-xl mx-auto p-3 mt-3">
+  <div id="msgBox" class="hidden mb-4 p-3 rounded-2xl bg-emerald-500/80 backdrop-blur-md text-white text-xs font-bold text-center border border-emerald-400/40 animate-modal shadow-lg"></div>
 
-  <!-- Direct Student View Card (Jab parent direct link kholein) -->
-  <div id="singleParentCard" class="hidden bg-slate-800 border border-indigo-500/50 p-5 rounded-2xl shadow-xl text-center space-y-4 mb-5">
-    <div>
-      <span class="text-[11px] bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Fee Invoice</span>
-      <h2 id="spName" class="text-xl font-bold text-white mt-2"></h2>
-      <p id="spDueText" class="text-sm text-slate-400 mt-1">Pending Tuition Fee</p>
+  <!-- Direct Student View Card (Private Link) -->
+  <div id="singleParentCard" class="hidden glass-card p-6 rounded-3xl text-center space-y-5 mb-5 relative overflow-hidden animate-card">
+    <div class="absolute -top-12 -right-12 w-36 h-36 bg-blue-500 rounded-full blur-3xl opacity-30"></div>
+    <div class="absolute -bottom-12 -left-12 w-36 h-36 bg-purple-500 rounded-full blur-3xl opacity-30"></div>
+    
+    <div class="relative z-10">
+      <span class="text-[10px] bg-blue-500/20 text-blue-200 px-3.5 py-1 rounded-full font-bold uppercase tracking-widest border border-blue-400/30">Fee Invoice</span>
+      <h2 id="spName" class="text-2xl font-extrabold text-white mt-3 drop-shadow"></h2>
+      <p class="text-xs text-blue-200/70 mt-1">Pending Tuition Fee</p>
     </div>
     
-    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
-      <p class="text-xs text-slate-400">Total Due Amount</p>
-      <p id="spDueAmt" class="text-3xl font-extrabold text-red-400 mt-1"></p>
+    <div class="relative z-10 bg-black/30 p-5 rounded-2xl border border-white/10 shadow-inner">
+      <p class="text-[11px] text-blue-200/70 uppercase tracking-widest mb-1">Total Due Amount</p>
+      <p id="spDueAmt" class="text-4xl font-black text-white drop-shadow-lg"></p>
     </div>
 
-    <a id="spUpiBtn" href="#" class="block w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-emerald-900/40">
+    <a id="spUpiBtn" onclick="playSound('success')" href="#" class="glow-btn relative z-10 block w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 transition-all text-white py-3.5 rounded-2xl font-bold text-sm border border-blue-400/40">
       💳 Pay via UPI (PhonePe / GPay)
     </a>
 
-    <div class="pt-2 border-t border-slate-700/60 text-left">
-      <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Recent Payments</h4>
-      <ul id="spHistory" class="space-y-1.5 text-xs"></ul>
+    <div class="relative z-10 pt-4 border-t border-white/10 text-left">
+      <h4 class="text-[10px] font-bold text-blue-200/60 uppercase tracking-widest mb-3">Recent Payments</h4>
+      <ul id="spHistory" class="space-y-2 text-xs"></ul>
     </div>
   </div>
 
   <!-- Admin & General Directory View -->
   <div id="generalPortalArea">
-    <div id="adminPanel" class="hidden space-y-3 mb-5">
+    <div id="adminPanel" class="hidden space-y-4 mb-6 animate-card">
+      
       <!-- Settings -->
-      <div class="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+      <div class="glass-card p-4 rounded-2xl">
         <div onclick="toggleBox('settingsBody')" class="flex justify-between items-center cursor-pointer">
-          <span class="text-xs font-bold text-indigo-400">⚙️ Tuition, UPI & PIN Settings</span>
-          <span class="text-xs text-slate-400">Open ▼</span>
+          <span class="text-xs font-bold text-blue-300">⚙️ Tuition, UPI & PIN Settings</span>
+          <span class="text-xs text-blue-200/50">Open ▼</span>
         </div>
-        <div id="settingsBody" class="hidden mt-3 pt-3 border-t border-slate-700 space-y-2">
-          <input id="setTuition" placeholder="Tuition Name" class="bg-slate-700 text-white p-2 rounded-lg text-xs w-full">
-          <input id="setUpi" placeholder="Your UPI ID (e.g. 9876543210@ybl)" class="bg-slate-700 text-white p-2 rounded-lg text-xs w-full">
-          <input id="setPin" placeholder="Admin PIN (Default: 1234)" class="bg-slate-700 text-white p-2 rounded-lg text-xs w-full">
-          <button onclick="saveSettings()" class="bg-indigo-600 text-white rounded-lg p-2 text-xs font-bold w-full">💾 Save Settings</button>
+        <div id="settingsBody" class="hidden mt-4 pt-4 border-t border-white/10 space-y-3">
+          <input id="setTuition" placeholder="Tuition Name" class="glass-input p-2.5 rounded-xl text-xs w-full transition-all placeholder-white/40">
+          <input id="setUpi" placeholder="Your UPI ID (e.g. 9876543210@ybl)" class="glass-input p-2.5 rounded-xl text-xs w-full transition-all placeholder-white/40">
+          <input id="setPin" placeholder="Admin PIN (Default: 1234)" class="glass-input p-2.5 rounded-xl text-xs w-full transition-all placeholder-white/40">
+          <button onclick="saveSettings()" class="bg-blue-600/80 hover:bg-blue-500 active:scale-95 text-white rounded-xl p-2.5 text-xs font-bold w-full transition-all border border-blue-400/30">💾 Save Settings</button>
         </div>
       </div>
 
       <!-- Add Student -->
-      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-2.5">
-        <h2 class="text-sm font-bold text-white">➕ Add New Student</h2>
-        <input id="stuName" placeholder="Student Name (e.g. Rajkishor Kumar)" class="bg-slate-700 border border-slate-600 text-white p-2.5 rounded-lg text-sm w-full">
-        <input id="stuPhone" type="tel" placeholder="Parent WhatsApp No. (Optional)" class="bg-slate-700 border border-slate-600 text-white p-2.5 rounded-lg text-sm w-full">
-        <div class="grid grid-cols-2 gap-2">
-          <input id="joinDate" type="date" class="bg-slate-700 border border-slate-600 text-white p-2.5 rounded-lg text-sm w-full">
-          <input id="monthlyFee" type="number" placeholder="Fee (₹)" class="bg-slate-700 border border-slate-600 text-white p-2.5 rounded-lg text-sm w-full">
+      <div class="glass-card p-5 rounded-2xl space-y-3">
+        <h2 class="text-sm font-bold text-white mb-1">➕ Add New Student</h2>
+        <input id="stuName" placeholder="Student Name (e.g. Rajkishor Kumar)" class="glass-input p-3 rounded-xl text-sm w-full transition-all placeholder-white/40">
+        <input id="stuPhone" type="tel" placeholder="Parent WhatsApp No. (Optional)" class="glass-input p-3 rounded-xl text-sm w-full transition-all placeholder-white/40">
+        <div class="grid grid-cols-2 gap-3">
+          <input id="joinDate" type="date" class="glass-input p-3 rounded-xl text-sm w-full transition-all text-white/80">
+          <input id="monthlyFee" type="number" placeholder="Fee (₹)" class="glass-input p-3 rounded-xl text-sm w-full transition-all placeholder-white/40">
         </div>
-        <button onclick="addStudent()" class="bg-indigo-600 active:bg-indigo-800 text-white rounded-lg p-2.5 text-sm font-bold w-full">
-          Save Student Profile
+        <button onclick="addStudent()" class="mt-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-95 transition-all text-white rounded-xl p-3 text-sm font-bold w-full shadow-lg border border-purple-400/30">
+          ✨ Save Student Profile
         </button>
       </div>
     </div>
 
-    <input oninput="renderList()" id="searchBox" placeholder="🔍 Search student by name..." class="bg-slate-800 border border-slate-700 text-white p-2.5 rounded-xl text-sm w-full mb-3">
+    <input oninput="renderList()" id="searchBox" placeholder="🔍 Search student by name..." class="glass-input p-3.5 rounded-2xl text-sm w-full mb-4 shadow-lg placeholder-white/50 transition-all">
 
-    <h2 class="text-sm font-bold mb-2 text-slate-300">👨‍🎓 Students Profiles & Fee Status</h2>
-    <div id="studentList" class="space-y-2.5"></div>
+    <h2 class="text-sm font-bold mb-3 text-white/80 tracking-wide pl-1">👨‍🎓 Students Profiles & Fee Status</h2>
+    <div id="studentList" class="space-y-3"></div>
   </div>
 </div>
 
 <!-- PIN Modal -->
-<div id="pinModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-30">
-  <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-xs w-full p-4 text-center">
-    <h3 class="text-sm font-bold text-white mb-1">🔐 Enter Admin PIN</h3>
-    <p class="text-[11px] text-slate-400 mb-2">Default PIN: 1234</p>
-    <input id="pinInput" type="password" placeholder="••••" class="bg-slate-900 border border-slate-600 text-white text-center text-lg p-2 rounded-xl w-full mb-3">
-    <div class="flex gap-2">
-      <button onclick="toggleBox('pinModal')" class="flex-1 bg-slate-700 py-2 rounded-xl text-xs font-bold">Cancel</button>
-      <button onclick="verifyPin()" class="flex-1 bg-indigo-600 py-2 rounded-xl text-xs font-bold">Unlock</button>
+<div id="pinModal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+  <div class="glass-card rounded-3xl max-w-xs w-full p-6 text-center animate-modal">
+    <h3 class="text-sm font-bold text-white mb-1 tracking-wide">🔐 Enter Admin PIN</h3>
+    <p class="text-[10px] text-white/50 mb-4 uppercase tracking-widest">Default PIN: 1234</p>
+    <input id="pinInput" type="password" placeholder="••••" class="bg-black/40 border border-white/15 text-white text-center text-xl p-3 rounded-2xl w-full mb-5 focus:outline-none focus:border-blue-400 transition-all">
+    <div class="flex gap-3">
+      <button onclick="toggleBox('pinModal')" class="flex-1 bg-white/10 hover:bg-white/20 active:scale-95 py-2.5 rounded-xl text-xs font-bold transition-all border border-white/10">Cancel</button>
+      <button onclick="verifyPin()" class="flex-1 bg-blue-600 hover:bg-blue-500 active:scale-95 py-2.5 rounded-xl text-xs font-bold transition-all border border-blue-400/40 shadow-lg">Unlock</button>
     </div>
   </div>
 </div>
 
-<!-- Profile Modal (Admin View) -->
-<div id="profileModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-3 z-20">
-  <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-4 max-h-[90vh] overflow-y-auto">
-    <div class="flex justify-between items-start border-b border-slate-700 pb-2.5">
+<!-- Profile Modal -->
+<div id="profileModal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-3 z-40">
+  <div class="glass-card rounded-3xl max-w-md w-full p-5 max-h-[90vh] overflow-y-auto relative overflow-hidden animate-modal">
+    <div class="absolute top-0 right-0 w-40 h-40 bg-blue-500 rounded-full blur-[50px] opacity-25 pointer-events-none"></div>
+    
+    <div class="flex justify-between items-start border-b border-white/10 pb-3 relative z-10">
       <div>
-        <h3 id="mName" class="text-lg font-bold text-white"></h3>
-        <p id="mFeeSummary" class="text-xs text-slate-400"></p>
+        <h3 id="mName" class="text-xl font-bold text-white"></h3>
+        <p id="mFeeSummary" class="text-xs text-blue-200/70 mt-0.5"></p>
       </div>
-      <button onclick="toggleBox('profileModal')" class="text-slate-400 text-lg font-bold px-2">✕</button>
+      <button onclick="toggleBox('profileModal')" class="text-white/60 hover:text-white active:scale-90 text-xl font-bold px-2 transition-all">✕</button>
     </div>
 
-    <div class="bg-slate-900 p-3 rounded-xl my-3 grid grid-cols-3 gap-2 text-center border border-slate-700">
-      <div><p class="text-[11px] text-slate-400">Monthly</p><p id="mFee" class="font-bold text-sm mt-0.5"></p></div>
-      <div><p class="text-[11px] text-slate-400">Total Paid</p><p id="mPaid" class="font-bold text-emerald-400 text-sm mt-0.5"></p></div>
-      <div><p class="text-[11px] text-slate-400">Pending Due</p><p id="mDue" class="font-bold text-red-400 text-base mt-0.5"></p></div>
+    <div class="bg-black/30 p-4 rounded-2xl my-4 grid grid-cols-3 gap-2 text-center border border-white/10 relative z-10">
+      <div><p class="text-[10px] text-white/50 uppercase mb-1">Monthly</p><p id="mFee" class="font-bold text-sm text-white"></p></div>
+      <div><p class="text-[10px] text-white/50 uppercase mb-1">Paid</p><p id="mPaid" class="font-bold text-emerald-400 text-sm"></p></div>
+      <div><p class="text-[10px] text-white/50 uppercase mb-1">Due</p><p id="mDue" class="font-bold text-red-400 text-lg"></p></div>
     </div>
 
-    <div id="adminControls" class="space-y-2.5 mb-3">
-      <div class="bg-slate-900 p-3 rounded-xl border border-indigo-500/40">
-        <label class="block text-xs font-bold text-indigo-300 mb-1.5">💰 Record Fee Payment</label>
+    <div id="adminControls" class="space-y-3 mb-4 relative z-10">
+      <div class="bg-black/25 p-4 rounded-2xl border border-blue-500/25">
+        <label class="block text-[11px] font-bold text-blue-300 uppercase tracking-wider mb-2">💰 Record Payment</label>
         <div class="flex gap-2">
-          <input id="payAmt" type="number" placeholder="Amount (₹)" class="bg-slate-800 border border-slate-600 text-white p-2 rounded-lg text-sm flex-1">
-          <button onclick="addPayment()" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold">+ Add Paid</button>
+          <input id="payAmt" type="number" placeholder="Amount (₹)" class="glass-input p-2.5 rounded-xl text-sm flex-1 placeholder-white/30">
+          <button onclick="addPayment()" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg border border-emerald-400/30">+ Add</button>
         </div>
       </div>
-      <button onclick="sendWhatsApp()" class="w-full bg-green-600 text-white py-2.5 rounded-xl font-bold text-xs">
-        📲 Send WhatsApp Fee Reminder
+      <button onclick="sendWhatsApp()" class="w-full bg-emerald-600/90 hover:bg-emerald-500 active:scale-95 text-white py-3 rounded-xl font-bold text-xs transition-all shadow-lg border border-emerald-400/30 flex items-center justify-center gap-2">
+        <span>📲</span> Send WhatsApp Reminder
       </button>
     </div>
 
-    <a id="upiBtn" href="#" class="block text-center w-full bg-indigo-600 text-white py-2.5 rounded-xl font-bold text-xs mb-3">
+    <a id="upiBtn" onclick="playSound('success')" href="#" class="block text-center w-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white py-3 rounded-xl font-bold text-xs mb-4 transition-all shadow-lg border border-blue-400/30 relative z-10">
       💳 Pay Pending Fee via UPI
     </a>
 
-    <h4 class="text-[11px] font-bold uppercase text-slate-400 mb-1.5">📜 Payment History</h4>
-    <ul id="historyList" class="space-y-1.5 text-xs max-h-40 overflow-y-auto"></ul>
+    <h4 class="text-[10px] font-bold uppercase text-white/40 tracking-widest mb-2 relative z-10">📜 Payment History</h4>
+    <ul id="historyList" class="space-y-1.5 text-xs max-h-40 overflow-y-auto relative z-10 pr-1"></ul>
 
-    <div id="delBox" class="mt-4 pt-2.5 border-t border-slate-700 text-right">
-      <button onclick="deleteStu()" class="text-xs text-red-400 font-bold">🗑️ Delete Student</button>
+    <div id="delBox" class="mt-5 pt-3 border-t border-white/10 text-right relative z-10">
+      <button onclick="deleteStu()" class="text-xs text-red-400 hover:text-red-300 active:scale-95 font-bold transition-all">🗑️ Delete Student</button>
     </div>
   </div>
 </div>
@@ -145,6 +225,44 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // Web Audio Synthesizer for Instant Sound Effects
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  window.playSound = function(type) {
+    try {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
+      if (type === 'click') {
+        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(550, now);
+        osc.frequency.exponentialRampToValueAtTime(180, now + 0.06);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.06);
+        osc.start(now); osc.stop(now + 0.06);
+      } else if (type === 'success') {
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+          const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f, now + i * 0.07);
+          gain.gain.setValueAtTime(0.18, now + i * 0.07);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.35);
+          osc.start(now + i * 0.07); osc.stop(now + i * 0.07 + 0.35);
+        });
+      } else if (type === 'error') {
+        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.setValueAtTime(110, now + 0.12);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.28);
+        osc.start(now); osc.stop(now + 0.28);
+      }
+    } catch(e) {}
+  };
 
   const firebaseConfig = {
     apiKey: "AIzaSyC0gzobslaGZdrwNpHNAamoaAzOlX_30Cg",
@@ -174,18 +292,18 @@
     if (snap.exists()) {
       db = snap.data();
       statusBadge.innerText = "☁️ Cloud Live";
-      statusBadge.className = "text-[10px] bg-emerald-900/80 px-2 py-0.5 rounded-full text-emerald-300 font-bold";
+      statusBadge.className = "text-[9px] bg-emerald-500/20 px-2 py-0.5 rounded-full text-emerald-300 border border-emerald-500/30";
       updateUI();
     } else {
-      setDoc(docRef, db).then(() => { statusBadge.innerText = "☁️ Cloud Synced"; });
+      setDoc(docRef, db).then(() => { statusBadge.innerText = "☁️ Synced"; });
     }
   }, (err) => {
     console.error(err);
-    document.getElementById('cloudStatus').innerText = "⚠️ Offline Mode";
+    document.getElementById('cloudStatus').innerText = "⚠️ Offline";
   });
 
   function updateUI() {
-    document.getElementById('navTitle').innerText = "📚 " + (db.settings.name || "Smart Tuition Tracker");
+    document.getElementById('navTitle').innerText = "📚 " + (db.settings.name || "Smart Tuition");
     document.getElementById('setTuition').value = db.settings.name || "";
     document.getElementById('setUpi').value = db.settings.upi || "";
     document.getElementById('setPin').value = db.settings.pin || "1234";
@@ -208,6 +326,10 @@
     const card = document.getElementById('singleParentCard');
     card.classList.remove('hidden');
 
+    document.getElementById('modeText').classList.add('hidden');
+    document.getElementById('cloudStatus').classList.add('hidden');
+    document.getElementById('roleBtn').classList.add('hidden');
+
     let { due } = calcFee(s);
     document.getElementById('spName').innerText = s.name;
     document.getElementById('spDueAmt').innerText = `₹${due}`;
@@ -215,18 +337,18 @@
     let upiBtn = document.getElementById('spUpiBtn');
     if (due > 0) {
       upiBtn.href = `upi://pay?pa=${db.settings.upi}&pn=${encodeURIComponent(db.settings.name)}&am=${due}&cu=INR`;
-      upiBtn.innerText = `💳 Pay Due ₹${due} via UPI`;
+      upiBtn.innerText = `💳 Pay ₹${due} via UPI`;
       upiBtn.classList.remove('pointer-events-none', 'opacity-50');
     } else {
       upiBtn.href = "#";
-      upiBtn.innerText = `✅ All Fees Cleared (₹0 Due)`;
-      upiBtn.classList.add('pointer-events-none', 'opacity-50');
+      upiBtn.innerText = `✨ All Fees Cleared (₹0)`;
+      upiBtn.classList.add('pointer-events-none', 'opacity-90');
     }
 
     let h = document.getElementById('spHistory');
     h.innerHTML = (s.payments && s.payments.length) ? s.payments.slice().reverse().map(p => 
-      `<li class="flex justify-between bg-slate-900 p-2 rounded border border-slate-700/60"><b class="text-emerald-400">+ ₹${p.amount}</b><span class="text-slate-400">${p.time}</span></li>`
-    ).join('') : `<li class="text-slate-500 italic">No past payment records.</li>`;
+      `<li class="flex justify-between bg-black/25 p-2.5 rounded-xl border border-white/10"><b class="text-emerald-400 text-sm">+ ₹${p.amount}</b><span class="text-white/60">${p.time}</span></li>`
+    ).join('') : `<li class="text-white/40 italic bg-black/15 p-3 rounded-xl border border-white/5">No past payment records.</li>`;
   }
 
   async function saveDb() {
@@ -241,6 +363,7 @@
   }
 
   window.toggleBox = function(id) {
+    window.playSound('click');
     document.getElementById(id).classList.toggle('hidden');
   };
 
@@ -257,116 +380,16 @@
     let box = document.getElementById('studentList');
     let q = document.getElementById('searchBox').value.toLowerCase();
     box.innerHTML = '';
-    (db.students || []).filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
+    (db.students || []).filter(s => s.name.toLowerCase().includes(q)).forEach((s, idx) => {
       let { due } = calcFee(s);
-      let badge = due > 0 ? `<span class="bg-red-500/20 text-red-300 text-xs font-bold px-2 py-1 rounded-full">Due: ₹${due}</span>`
-                          : `<span class="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-2 py-1 rounded-full">Clear ₹0</span>`;
+      let badge = due > 0 ? `<span class="bg-red-500/20 text-red-300 text-[10px] font-bold px-2.5 py-1 rounded-full border border-red-500/30">Due: ₹${due}</span>`
+                          : `<span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-500/30">Clear ₹0</span>`;
       box.innerHTML += `
-        <div onclick="openProfile(${s.id})" class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex justify-between items-center cursor-pointer">
+        <div style="animation-delay: ${idx * 50}ms" onclick="openProfile(${s.id})" class="animate-card glass-card p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-white/10 active:scale-[0.98] transition-all">
           <div>
-            <h3 class="font-bold text-white text-sm">${s.name}</h3>
-            <p class="text-[11px] text-slate-400">Monthly Fee: ₹${s.fee}</p>
+            <h3 class="font-bold text-white text-sm tracking-wide">${s.name}</h3>
+            <p class="text-[11px] text-white/50 mt-0.5">Fee: ₹${s.fee}/mo</p>
           </div>
-          <div class="text-right">${badge}<p class="text-[11px] text-indigo-400 font-bold mt-1">Open →</p></div>
-        </div>`;
-    });
-  };
-
-  window.addStudent = function() {
-    let name = document.getElementById('stuName').value.trim();
-    let phone = document.getElementById('stuPhone').value.trim();
-    let joinDate = document.getElementById('joinDate').value;
-    let fee = Number(document.getElementById('monthlyFee').value);
-    if (!name || !joinDate || !fee) return msg("⚠️ Naam, Date aur Fee teeno bharein!");
-    db.students.push({ id: Date.now(), name, phone, joinDate, fee, payments: [] });
-    document.getElementById('stuName').value = '';
-    document.getElementById('stuPhone').value = '';
-    document.getElementById('monthlyFee').value = '';
-    saveDb(); msg("☁️ Student Saved!");
-  };
-
-  window.openProfile = function(id) {
-    activeId = id;
-    let s = db.students.find(x => x.id === id);
-    if (!s) return;
-    let { paid, due } = calcFee(s);
-    document.getElementById('mName').innerText = s.name;
-    document.getElementById('mFeeSummary').innerText = `Fee: ₹${s.fee} / month`;
-    document.getElementById('mFee').innerText = `₹${s.fee}`;
-    document.getElementById('mPaid').innerText = `₹${paid}`;
-    document.getElementById('mDue').innerText = `₹${due}`;
-
-    let upi = document.getElementById('upiBtn');
-    upi.href = `upi://pay?pa=${db.settings.upi}&pn=${encodeURIComponent(db.settings.name)}&am=${due}&cu=INR`;
-    upi.innerText = due > 0 ? `💳 Pay Pending ₹${due} via UPI` : `✅ All Fee Cleared (₹0)`;
-
-    let h = document.getElementById('historyList');
-    h.innerHTML = (s.payments && s.payments.length) ? s.payments.slice().reverse().map(p => 
-      `<li class="flex justify-between bg-slate-900 p-2 rounded border border-slate-700"><b class="text-emerald-400">+ ₹${p.amount}</b><span class="text-slate-400">${p.time}</span></li>`
-    ).join('') : `<li class="text-slate-500 italic">No payments yet.</li>`;
-
-    document.getElementById('profileModal').classList.remove('hidden');
-  };
-
-  window.addPayment = function() {
-    let amt = Number(document.getElementById('payAmt').value);
-    if (!amt) return;
-    let s = db.students.find(x => x.id === activeId);
-    let now = new Date();
-    let time = now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) + ', ' + now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
-    if (!s.payments) s.payments = [];
-    s.payments.push({ amount: amt, time });
-    document.getElementById('payAmt').value = '';
-    saveDb(); window.openProfile(activeId); msg("☁️ Payment Updated!");
-  };
-
-  window.sendWhatsApp = function() {
-    let s = db.students.find(x => x.id === activeId);
-    let { due } = calcFee(s);
-    
-    let directPayLink = `${window.location.origin}${window.location.pathname}?student=${s.id}`;
-
-    let text = `नमस्ते / Hello 🙏\n\n*${s.name}* की बकाया ट्यूशन फीस *₹${due}* है।\n(Pending tuition fee for *${s.name}* is *₹${due}*)\n\nऑनलाइन फीस जमा करने के लिए नीचे दिए गए लिंक पर क्लिक करें:\n(Click the link below to pay directly via PhonePe/GPay/Paytm):\n\n🔗 ${directPayLink}\n\nधन्यवाद / Thank you!`;
-
-    let ph = (s.phone || "").replace(/\D/g, '');
-    let url = (ph.length === 10 ? `https://wa.me/91${ph}` : `https://wa.me/`) + `?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
-  };
-
-  window.deleteStu = function() {
-    db.students = db.students.filter(x => x.id !== activeId);
-    saveDb(); window.toggleBox('profileModal'); msg("🗑️ Profile Deleted!");
-  };
-
-  window.saveSettings = function() {
-    db.settings.name = document.getElementById('setTuition').value.trim() || db.settings.name;
-    db.settings.upi = document.getElementById('setUpi').value.trim() || db.settings.upi;
-    db.settings.pin = document.getElementById('setPin').value.trim() || "1234";
-    saveDb(); window.toggleBox('settingsBody'); msg("☁️ Settings Saved!");
-  };
-
-  window.handleRoleSwitch = function() {
-    if (isAdmin) setRole(false);
-    else { document.getElementById('pinInput').value = ''; window.toggleBox('pinModal'); }
-  };
-
-  window.verifyPin = function() {
-    if (document.getElementById('pinInput').value === (db.settings.pin || "1234")) {
-      setRole(true); window.toggleBox('pinModal'); msg("🔓 Admin Unlocked!");
-    } else msg("❌ Wrong PIN!");
-  };
-
-  function setRole(admin) {
-    isAdmin = admin;
-    document.getElementById('adminPanel').classList.toggle('hidden', !admin);
-    document.getElementById('adminControls').classList.toggle('hidden', !admin);
-    document.getElementById('delBox').classList.toggle('hidden', !admin);
-    document.getElementById('modeText').innerText = admin ? "Mode: Admin (Unlocked 🔓)" : "Mode: Parent View (Read-Only 👁️)";
-    document.getElementById('roleBtn').innerText = admin ? "Lock Parent View 🔒" : "Admin Unlock 🔑";
-    updateUI();
-  }
-
-  setRole(false);
-</script>
-</body>
-</html>
+          <div class="text-right flex flex-col items-end gap-1">
+            ${badge}
+ 
