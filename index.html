@@ -265,3 +265,31 @@ saveDb();
 </script>
 </body>
 </html>
+<!-- Firebase Database Connection -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // Aapki Firebase Keys
+  const firebaseConfig = {
+    apiKey: "AIzaSyC0gzobslaGZdrwNpHNAamoaAzOlX_30Cg",
+    authDomain: "tuition-traker.firebaseapp.com",
+    projectId: "tuition-traker",
+    storageBucket: "tuition-traker.firebasestorage.app",
+    messagingSenderId: "194003123154",
+    appId: "1:194003123154:web:bfa0fb5a5bb394abc9260b"
+  };
+
+  // Firebase Chalu Karein
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  
+  // Database ko app ke dusre hisso ke liye available karein
+  window.db = db;
+  window.collection = collection;
+  window.getDocs = getDocs;
+  window.doc = doc;
+  window.setDoc = setDoc;
+  
+  console.log("Firebase Connected Successfully!");
+</script>
