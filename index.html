@@ -327,10 +327,21 @@
     saveDb(); window.openProfile(activeId); msg("☁️ Payment Updated!");
   };
 
-  window.sendWhatsApp = function() {
+    window.sendWhatsApp = function() {
     let s = db.students.find(x => x.id === activeId);
     let { due } = calcFee(s);
     
+    // Student ka private link
+    let directPayLink = `${window.location.origin}${window.location.pathname}?student=${s.id}`;
+
+    // Pure Hindi (Devanagari) + English Message
+    let text = `नमस्ते / Hello 🙏\n\n*${s.name}* की बकाया ट्यूशन फीस *₹${due}* है।\n(Pending tuition fee for *${s.name}* is *₹${due}*)\n\nऑनलाइन फीस जमा करने के लिए नीचे दिए गए लिंक पर क्लिक करें:\n(Click the link below to pay directly via PhonePe/GPay/Paytm):\n\n🔗 ${directPayLink}\n\nधन्यवाद / Thank you!`;
+
+    let ph = (s.phone || "").replace(/\D/g, '');
+    let url = (ph.length === 10 ? `https://wa.me/91${ph}` : `https://wa.me/`) + `?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+  
     // Har student ka unique secret direct invoice link
     let directPayLink = `${window.location.origin}${window.location.pathname}?student=${s.id}`;
 
