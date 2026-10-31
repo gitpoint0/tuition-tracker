@@ -280,15 +280,18 @@
     saveDb(); window.openProfile(activeId); msg("☁️ Payment Cloud Par Update Ho Gayi!");
   };
 
-  window.sendWhatsApp = function() {
+    window.sendWhatsApp = function() {
     let s = db.students.find(x => x.id === activeId);
-    let { m, paid, due } = calcFee(s);
-    let text = `Namaste 🙏,\n*${db.settings.name}* Fee Update:\n👨‍🎓 Student: *${s.name}*\n📅 Joined: ${s.joinDate} (${m} Mo)\n✅ Paid: ₹${paid}\n🚨 *Pending Due: ₹${due}*\nKripya UPI ID *${db.settings.upi}* par fee jama karein.`;
+    let { due } = calcFee(s);
+    let appLink = window.location.origin; 
+
+    let text = `Namaste 🙏\n\n*${s.name}* ki pending tuition fee *₹${due}* hai.\n\nKripya is link par click karein aur seedhe UPI (PhonePe/GPay) se payment karein 👇\n\n🔗 ${appLink}`;
+
     let ph = (s.phone || "").replace(/\D/g, '');
     let url = (ph.length === 10 ? `https://wa.me/91${ph}` : `https://wa.me/`) + `?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
-
+  
   window.deleteStu = function() {
     db.students = db.students.filter(x => x.id !== activeId);
     saveDb(); window.toggleBox('profileModal'); msg("🗑️ Profile Deleted from Cloud!");
