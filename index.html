@@ -10,7 +10,6 @@
     background: #090d16;
     overflow-x: hidden;
   }
-  /* 3D Animated Background Blobs */
   .bg-blob-1 {
     position: fixed; top: -10%; left: -10%; width: 300px; height: 300px;
     background: radial-gradient(circle, rgba(59,130,246,0.5) 0%, rgba(37,99,235,0) 70%);
@@ -27,8 +26,6 @@
     0% { transform: translate(0, 0) scale(1); }
     100% { transform: translate(40px, 50px) scale(1.15); }
   }
-
-  /* Glassmorphism Styles */
   .glass-card {
     background: rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(20px);
@@ -51,34 +48,25 @@
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
-
-  /* Smooth Entry & Pulse Animations */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(18px) scale(0.97); }
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
-  .animate-card {
-    animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
+  .animate-card { animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
   @keyframes popModal {
     0% { opacity: 0; transform: scale(0.85); }
     100% { opacity: 1; transform: scale(1); }
   }
-  .animate-modal {
-    animation: popModal 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  }
+  .animate-modal { animation: popModal 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
   @keyframes pulseGlow {
     0%, 100% { box-shadow: 0 0 15px rgba(37, 99, 235, 0.4); }
     50% { box-shadow: 0 0 28px rgba(59, 130, 246, 0.8); }
   }
-  .glow-btn {
-    animation: pulseGlow 2.2s infinite;
-  }
+  .glow-btn { animation: pulseGlow 2.2s infinite; }
 </style>
 </head>
 <body class="text-slate-100 min-h-screen font-sans pb-12">
 
-<!-- 3D Floating Background Spheres -->
 <div class="bg-blob-1"></div>
 <div class="bg-blob-2"></div>
 
@@ -98,37 +86,31 @@
 <div class="max-w-xl mx-auto p-3 mt-3">
   <div id="msgBox" class="hidden mb-4 p-3 rounded-2xl bg-emerald-500/80 backdrop-blur-md text-white text-xs font-bold text-center border border-emerald-400/40 animate-modal shadow-lg"></div>
 
-  <!-- Direct Student View Card (Private Link) -->
+  <!-- Direct Student View Card -->
   <div id="singleParentCard" class="hidden glass-card p-6 rounded-3xl text-center space-y-5 mb-5 relative overflow-hidden animate-card">
     <div class="absolute -top-12 -right-12 w-36 h-36 bg-blue-500 rounded-full blur-3xl opacity-30"></div>
     <div class="absolute -bottom-12 -left-12 w-36 h-36 bg-purple-500 rounded-full blur-3xl opacity-30"></div>
-    
     <div class="relative z-10">
       <span class="text-[10px] bg-blue-500/20 text-blue-200 px-3.5 py-1 rounded-full font-bold uppercase tracking-widest border border-blue-400/30">Fee Invoice</span>
       <h2 id="spName" class="text-2xl font-extrabold text-white mt-3 drop-shadow"></h2>
       <p class="text-xs text-blue-200/70 mt-1">Pending Tuition Fee</p>
     </div>
-    
     <div class="relative z-10 bg-black/30 p-5 rounded-2xl border border-white/10 shadow-inner">
       <p class="text-[11px] text-blue-200/70 uppercase tracking-widest mb-1">Total Due Amount</p>
       <p id="spDueAmt" class="text-4xl font-black text-white drop-shadow-lg"></p>
     </div>
-
-    <a id="spUpiBtn" onclick="playSound('success')" href="#" class="glow-btn relative z-10 block w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 transition-all text-white py-3.5 rounded-2xl font-bold text-sm border border-blue-400/40">
+    <a id="spUpiBtn" onclick="playSound('success')" href="#" class="glow-btn relative z-10 block w-full bg-gradient-to-r from-blue-600 to-indigo-600 active:scale-95 transition-all text-white py-3.5 rounded-2xl font-bold text-sm border border-blue-400/40">
       💳 Pay via UPI (PhonePe / GPay)
     </a>
-
     <div class="relative z-10 pt-4 border-t border-white/10 text-left">
       <h4 class="text-[10px] font-bold text-blue-200/60 uppercase tracking-widest mb-3">Recent Payments</h4>
       <ul id="spHistory" class="space-y-2 text-xs"></ul>
     </div>
   </div>
 
-  <!-- Admin & General Directory View -->
+  <!-- Admin Portal Area -->
   <div id="generalPortalArea">
     <div id="adminPanel" class="hidden space-y-4 mb-6 animate-card">
-      
-      <!-- Settings -->
       <div class="glass-card p-4 rounded-2xl">
         <div onclick="toggleBox('settingsBody')" class="flex justify-between items-center cursor-pointer">
           <span class="text-xs font-bold text-blue-300">⚙️ Tuition, UPI & PIN Settings</span>
@@ -138,11 +120,10 @@
           <input id="setTuition" placeholder="Tuition Name" class="glass-input p-2.5 rounded-xl text-xs w-full transition-all placeholder-white/40">
           <input id="setUpi" placeholder="Your UPI ID (e.g. 9876543210@ybl)" class="glass-input p-2.5 rounded-xl text-xs w-full transition-all placeholder-white/40">
           <input id="setPin" placeholder="Admin PIN (Default: 1234)" class="glass-input p-2.5 rounded-xl text-xs w-full transition-all placeholder-white/40">
-          <button onclick="saveSettings()" class="bg-blue-600/80 hover:bg-blue-500 active:scale-95 text-white rounded-xl p-2.5 text-xs font-bold w-full transition-all border border-blue-400/30">💾 Save Settings</button>
+          <button onclick="saveSettings()" class="bg-blue-600/80 active:scale-95 text-white rounded-xl p-2.5 text-xs font-bold w-full transition-all border border-blue-400/30">💾 Save Settings</button>
         </div>
       </div>
 
-      <!-- Add Student -->
       <div class="glass-card p-5 rounded-2xl space-y-3">
         <h2 class="text-sm font-bold text-white mb-1">➕ Add New Student</h2>
         <input id="stuName" placeholder="Student Name (e.g. Rajkishor Kumar)" class="glass-input p-3 rounded-xl text-sm w-full transition-all placeholder-white/40">
@@ -151,14 +132,13 @@
           <input id="joinDate" type="date" class="glass-input p-3 rounded-xl text-sm w-full transition-all text-white/80">
           <input id="monthlyFee" type="number" placeholder="Fee (₹)" class="glass-input p-3 rounded-xl text-sm w-full transition-all placeholder-white/40">
         </div>
-        <button onclick="addStudent()" class="mt-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-95 transition-all text-white rounded-xl p-3 text-sm font-bold w-full shadow-lg border border-purple-400/30">
+        <button onclick="addStudent()" class="mt-2 bg-gradient-to-r from-purple-600 to-indigo-600 active:scale-95 transition-all text-white rounded-xl p-3 text-sm font-bold w-full shadow-lg border border-purple-400/30">
           ✨ Save Student Profile
         </button>
       </div>
     </div>
 
     <input oninput="renderList()" id="searchBox" placeholder="🔍 Search student by name..." class="glass-input p-3.5 rounded-2xl text-sm w-full mb-4 shadow-lg placeholder-white/50 transition-all">
-
     <h2 class="text-sm font-bold mb-3 text-white/80 tracking-wide pl-1">👨‍🎓 Students Profiles & Fee Status</h2>
     <div id="studentList" class="space-y-3"></div>
   </div>
@@ -171,8 +151,8 @@
     <p class="text-[10px] text-white/50 mb-4 uppercase tracking-widest">Default PIN: 1234</p>
     <input id="pinInput" type="password" placeholder="••••" class="bg-black/40 border border-white/15 text-white text-center text-xl p-3 rounded-2xl w-full mb-5 focus:outline-none focus:border-blue-400 transition-all">
     <div class="flex gap-3">
-      <button onclick="toggleBox('pinModal')" class="flex-1 bg-white/10 hover:bg-white/20 active:scale-95 py-2.5 rounded-xl text-xs font-bold transition-all border border-white/10">Cancel</button>
-      <button onclick="verifyPin()" class="flex-1 bg-blue-600 hover:bg-blue-500 active:scale-95 py-2.5 rounded-xl text-xs font-bold transition-all border border-blue-400/40 shadow-lg">Unlock</button>
+      <button onclick="toggleBox('pinModal')" class="flex-1 bg-white/10 active:scale-95 py-2.5 rounded-xl text-xs font-bold transition-all border border-white/10">Cancel</button>
+      <button onclick="verifyPin()" class="flex-1 bg-blue-600 active:scale-95 py-2.5 rounded-xl text-xs font-bold transition-all border border-blue-400/40 shadow-lg">Unlock</button>
     </div>
   </div>
 </div>
@@ -181,43 +161,37 @@
 <div id="profileModal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-3 z-40">
   <div class="glass-card rounded-3xl max-w-md w-full p-5 max-h-[90vh] overflow-y-auto relative overflow-hidden animate-modal">
     <div class="absolute top-0 right-0 w-40 h-40 bg-blue-500 rounded-full blur-[50px] opacity-25 pointer-events-none"></div>
-    
     <div class="flex justify-between items-start border-b border-white/10 pb-3 relative z-10">
       <div>
         <h3 id="mName" class="text-xl font-bold text-white"></h3>
         <p id="mFeeSummary" class="text-xs text-blue-200/70 mt-0.5"></p>
       </div>
-      <button onclick="toggleBox('profileModal')" class="text-white/60 hover:text-white active:scale-90 text-xl font-bold px-2 transition-all">✕</button>
+      <button onclick="toggleBox('profileModal')" class="text-white/60 active:scale-90 text-xl font-bold px-2 transition-all">✕</button>
     </div>
-
     <div class="bg-black/30 p-4 rounded-2xl my-4 grid grid-cols-3 gap-2 text-center border border-white/10 relative z-10">
       <div><p class="text-[10px] text-white/50 uppercase mb-1">Monthly</p><p id="mFee" class="font-bold text-sm text-white"></p></div>
       <div><p class="text-[10px] text-white/50 uppercase mb-1">Paid</p><p id="mPaid" class="font-bold text-emerald-400 text-sm"></p></div>
       <div><p class="text-[10px] text-white/50 uppercase mb-1">Due</p><p id="mDue" class="font-bold text-red-400 text-lg"></p></div>
     </div>
-
     <div id="adminControls" class="space-y-3 mb-4 relative z-10">
       <div class="bg-black/25 p-4 rounded-2xl border border-blue-500/25">
         <label class="block text-[11px] font-bold text-blue-300 uppercase tracking-wider mb-2">💰 Record Payment</label>
         <div class="flex gap-2">
           <input id="payAmt" type="number" placeholder="Amount (₹)" class="glass-input p-2.5 rounded-xl text-sm flex-1 placeholder-white/30">
-          <button onclick="addPayment()" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg border border-emerald-400/30">+ Add</button>
+          <button onclick="addPayment()" class="bg-emerald-600 active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg border border-emerald-400/30">+ Add</button>
         </div>
       </div>
-      <button onclick="sendWhatsApp()" class="w-full bg-emerald-600/90 hover:bg-emerald-500 active:scale-95 text-white py-3 rounded-xl font-bold text-xs transition-all shadow-lg border border-emerald-400/30 flex items-center justify-center gap-2">
+      <button onclick="sendWhatsApp()" class="w-full bg-emerald-600/90 active:scale-95 text-white py-3 rounded-xl font-bold text-xs transition-all shadow-lg border border-emerald-400/30 flex items-center justify-center gap-2">
         <span>📲</span> Send WhatsApp Reminder
       </button>
     </div>
-
-    <a id="upiBtn" onclick="playSound('success')" href="#" class="block text-center w-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white py-3 rounded-xl font-bold text-xs mb-4 transition-all shadow-lg border border-blue-400/30 relative z-10">
+    <a id="upiBtn" onclick="playSound('success')" href="#" class="block text-center w-full bg-blue-600 active:scale-95 text-white py-3 rounded-xl font-bold text-xs mb-4 transition-all shadow-lg border border-blue-400/30 relative z-10">
       💳 Pay Pending Fee via UPI
     </a>
-
     <h4 class="text-[10px] font-bold uppercase text-white/40 tracking-widest mb-2 relative z-10">📜 Payment History</h4>
     <ul id="historyList" class="space-y-1.5 text-xs max-h-40 overflow-y-auto relative z-10 pr-1"></ul>
-
     <div id="delBox" class="mt-5 pt-3 border-t border-white/10 text-right relative z-10">
-      <button onclick="deleteStu()" class="text-xs text-red-400 hover:text-red-300 active:scale-95 font-bold transition-all">🗑️ Delete Student</button>
+      <button onclick="deleteStu()" class="text-xs text-red-400 active:scale-95 font-bold transition-all">🗑️ Delete Student</button>
     </div>
   </div>
 </div>
@@ -226,39 +200,31 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // Web Audio Synthesizer for Instant Sound Effects
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  let audioCtx = null;
   window.playSound = function(type) {
     try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === 'suspended') audioCtx.resume();
       const now = audioCtx.currentTime;
       if (type === 'click') {
         const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
         osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(550, now);
-        osc.frequency.exponentialRampToValueAtTime(180, now + 0.06);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.06);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(550, now); osc.frequency.exponentialRampToValueAtTime(180, now + 0.06);
+        gain.gain.setValueAtTime(0.15, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.06);
         osc.start(now); osc.stop(now + 0.06);
       } else if (type === 'success') {
         [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
           const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
           osc.connect(gain); gain.connect(audioCtx.destination);
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(f, now + i * 0.07);
-          gain.gain.setValueAtTime(0.18, now + i * 0.07);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.35);
+          osc.type = 'triangle'; osc.frequency.setValueAtTime(f, now + i * 0.07);
+          gain.gain.setValueAtTime(0.18, now + i * 0.07); gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.35);
           osc.start(now + i * 0.07); osc.stop(now + i * 0.07 + 0.35);
         });
       } else if (type === 'error') {
         const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
         osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(140, now);
-        osc.frequency.setValueAtTime(110, now + 0.12);
-        gain.gain.setValueAtTime(0.18, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.28);
+        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(140, now); osc.frequency.setValueAtTime(110, now + 0.12);
+        gain.gain.setValueAtTime(0.18, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.28);
         osc.start(now); osc.stop(now + 0.28);
       }
     } catch(e) {}
@@ -277,11 +243,7 @@
   const firestoreDb = getFirestore(app);
   const docRef = doc(firestoreDb, "tuition_data", "main_store");
 
-  let db = {
-    settings: { name: "Smart Tuition Tracker", upi: "yourname@ybl", pin: "1234" },
-    students: []
-  };
-
+  let db = { settings: { name: "Smart Tuition Tracker", upi: "yourname@ybl", pin: "1234" }, students: [] };
   let isAdmin = false, activeId = null;
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -310,10 +272,7 @@
 
     if (requestedStudentId && !isAdmin) {
       let st = (db.students || []).find(x => String(x.id) === String(requestedStudentId));
-      if (st) {
-        showPrivateStudentCard(st);
-        return;
-      }
+      if (st) { showPrivateStudentCard(st); return; }
     }
 
     document.getElementById('singleParentCard').classList.add('hidden');
@@ -323,9 +282,7 @@
 
   function showPrivateStudentCard(s) {
     document.getElementById('generalPortalArea').classList.add('hidden');
-    const card = document.getElementById('singleParentCard');
-    card.classList.remove('hidden');
-
+    document.getElementById('singleParentCard').classList.remove('hidden');
     document.getElementById('modeText').classList.add('hidden');
     document.getElementById('cloudStatus').classList.add('hidden');
     document.getElementById('roleBtn').classList.add('hidden');
@@ -340,8 +297,7 @@
       upiBtn.innerText = `💳 Pay ₹${due} via UPI`;
       upiBtn.classList.remove('pointer-events-none', 'opacity-50');
     } else {
-      upiBtn.href = "#";
-      upiBtn.innerText = `✨ All Fees Cleared (₹0)`;
+      upiBtn.href = "#"; upiBtn.innerText = `✨ All Fees Cleared (₹0)`;
       upiBtn.classList.add('pointer-events-none', 'opacity-90');
     }
 
@@ -351,10 +307,7 @@
     ).join('') : `<li class="text-white/40 italic bg-black/15 p-3 rounded-xl border border-white/5">No past payment records.</li>`;
   }
 
-  async function saveDb() {
-    updateUI();
-    try { await setDoc(docRef, db); } catch(e) { console.error(e); }
-  }
+  async function saveDb() { updateUI(); try { await setDoc(docRef, db); } catch(e) {} }
 
   function msg(t) {
     let b = document.getElementById('msgBox');
@@ -362,34 +315,33 @@
     setTimeout(() => b.classList.add('hidden'), 2500);
   }
 
-  window.toggleBox = function(id) {
-    window.playSound('click');
-    document.getElementById(id).classList.toggle('hidden');
-  };
+  window.toggleBox = function(id) { window.playSound('click'); document.getElementById(id).classList.toggle('hidden'); };
 
   function calcFee(s) {
     let j = new Date(s.joinDate), n = new Date();
     let m = isNaN(j) ? 1 : (n.getFullYear() - j.getFullYear()) * 12 + (n.getMonth() - j.getMonth()) + (n.getDate() >= j.getDate() ? 1 : 0);
-    m = Math.max(1, m);
-    let paid = (s.payments || []).reduce((a, b) => a + b.amount, 0);
-    let due = Math.max(0, (m * s.fee) - paid);
-    return { m, paid, due };
+    m = Math.max(1, m); let paid = (s.payments || []).reduce((a, b) => a + b.amount, 0);
+    let due = Math.max(0, (m * s.fee) - paid); return { m, paid, due };
   }
 
   window.renderList = function() {
-    let box = document.getElementById('studentList');
-    let q = document.getElementById('searchBox').value.toLowerCase();
-    box.innerHTML = '';
+    let box = document.getElementById('studentList'), q = document.getElementById('searchBox').value.toLowerCase(); box.innerHTML = '';
     (db.students || []).filter(s => s.name.toLowerCase().includes(q)).forEach((s, idx) => {
       let { due } = calcFee(s);
       let badge = due > 0 ? `<span class="bg-red-500/20 text-red-300 text-[10px] font-bold px-2.5 py-1 rounded-full border border-red-500/30">Due: ₹${due}</span>`
                           : `<span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-500/30">Clear ₹0</span>`;
       box.innerHTML += `
         <div style="animation-delay: ${idx * 50}ms" onclick="openProfile(${s.id})" class="animate-card glass-card p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-white/10 active:scale-[0.98] transition-all">
-          <div>
-            <h3 class="font-bold text-white text-sm tracking-wide">${s.name}</h3>
-            <p class="text-[11px] text-white/50 mt-0.5">Fee: ₹${s.fee}/mo</p>
-          </div>
-          <div class="text-right flex flex-col items-end gap-1">
-            ${badge}
- 
+          <div><h3 class="font-bold text-white text-sm tracking-wide">${s.name}</h3><p class="text-[11px] text-white/50 mt-0.5">Fee: ₹${s.fee}/mo</p></div>
+          <div class="text-right flex flex-col items-end gap-1">${badge}<p class="text-[10px] text-blue-300 font-bold mt-0.5">Open ➔</p></div>
+        </div>`;
+    });
+  };
+
+  window.addStudent = function() {
+    let name = document.getElementById('stuName').value.trim(), phone = document.getElementById('stuPhone').value.trim();
+    let joinDate = document.getElementById('joinDate').value, fee = Number(document.getElementById('monthlyFee').value);
+    if (!name || !joinDate || !fee) { window.playSound('error'); return msg("⚠️ Please fill all details!"); }
+    db.students.push({ id: Date.now(), name, phone, joinDate, fee, payments: [] });
+    document.getElementById('stuName').value = ''; document.getElementById('stuPhone').value = ''; document.getElementById('monthlyFee').value = '';
+    window.playSound('success'); saveDb(); 
