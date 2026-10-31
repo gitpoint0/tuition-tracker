@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Tuition Tracker</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans pb-12">
@@ -10,7 +11,10 @@
 <nav class="bg-indigo-600 text-white p-3.5 shadow flex justify-between items-center sticky top-0 z-10">
   <div>
     <h1 id="navTitle" class="text-base font-bold">📚 Smart Tuition Tracker</h1>
-    <p id="modeText" class="text-[11px] text-indigo-200">Mode: Admin (Unlocked 🔓)</p>
+    <div class="flex items-center gap-2">
+      <p id="modeText" class="text-[11px] text-indigo-200">Mode: Admin (Unlocked 🔓)</p>
+      <span id="cloudStatus" class="text-[10px] bg-indigo-800 px-2 py-0.5 rounded-full text-amber-300">⏳ Connecting Cloud...</span>
+    </div>
   </div>
   <button onclick="handleRoleSwitch()" id="roleBtn" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-400">
     Lock Parent View 🔒
@@ -112,165 +116,10 @@
   </div>
 </div>
 
-<script>
-let db = {
-  settings: { name: "Smart Tuition Tracker", upi: "yourname@ybl", pin: "1234" },
-  students: [
-    { id: 1, name: "Rajkishor Kumar", phone: "", joinDate: "2024-12-01", fee: 500, payments: [
-      { amount: 500, time: "05 Dec 2024, 04:30 PM" },
-      { amount: 500, time: "30 Oct 2026, 09:39 PM" }
-    ]}
-  ]
-};
-
-try {
-  let saved = localStorage.getItem('tuition_v4');
-  if (saved) db = JSON.parse(saved);
-} catch(e) {}
-
-let isAdmin = true, activeId = null;
-
-function saveDb() {
-  try { localStorage.setItem('tuition_v4', JSON.stringify(db)); } catch(e) {}
-  document.getElementById('navTitle').innerText = "📚 " + db.settings.name;
-  renderList();
-}
-
-function msg(t) {
-  let b = document.getElementById('msgBox');
-  b.innerText = t; b.classList.remove('hidden');
-  setTimeout(() => b.classList.add('hidden'), 2500);
-}
-
-function toggleBox(id) {
-  document.getElementById(id).classList.toggle('hidden');
-}
-
-function calcFee(s) {
-  let j = new Date(s.joinDate), n = new Date();
-  let m = isNaN(j) ? 1 : (n.getFullYear() - j.getFullYear()) * 12 + (n.getMonth() - j.getMonth()) + (n.getDate() >= j.getDate() ? 1 : 0);
-  m = Math.max(1, m);
-  let paid = s.payments.reduce((a, b) => a + b.amount, 0);
-  let due = Math.max(0, (m * s.fee) - paid);
-  return { m, paid, due };
-}
-
-function renderList() {
-  let box = document.getElementById('studentList');
-  let q = document.getElementById('searchBox').value.toLowerCase();
-  box.innerHTML = '';
-  db.students.filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
-    let { m, paid, due } = calcFee(s);
-    let badge = due > 0 ? `<span class="bg-red-500/20 text-red-300 text-xs font-bold px-2 py-1 rounded-full">Due: ₹${due}</span>`
-                        : `<span class="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-2 py-1 rounded-full">Clear ₹0</span>`;
-    box.innerHTML += `
-      <div onclick="openProfile(${s.id})" class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex justify-between items-center cursor-pointer">
-        <div>
-          <h3 class="font-bold text-white text-sm">${s.name}</h3>
-          <p class="text-[11px] text-slate-400">Joined: ${s.joinDate} (${m} Mo) • Fee: ₹${s.fee}</p>
-        </div>
-        <div class="text-right">${badge}<p class="text-[11px] text-indigo-400 font-bold mt-1">Open →</p></div>
-      </div>`;
-  });
-}
-
-function addStudent() {
-  let name = document.getElementById('stuName').value.trim();
-  let phone = document.getElementById('stuPhone').value.trim();
-  let joinDate = document.getElementById('joinDate').value;
-  let fee = Number(document.getElementById('monthlyFee').value);
-  if (!name || !joinDate || !fee) return msg("⚠️ Naam, Date aur Fee teeno bharein!");
-  db.students.push({ id: Date.now(), name, phone, joinDate, fee, payments: [] });
-  document.getElementById('stuName').value = '';
-  document.getElementById('stuPhone').value = '';
-  document.getElementById('monthlyFee').value = '';
-  saveDb(); msg("✅ Student Save Ho Gaya!");
-}
-
-function openProfile(id) {
-  activeId = id;
-  let s = db.students.find(x => x.id === id);
-  let { m, paid, due } = calcFee(s);
-  document.getElementById('mName').innerText = s.name;
-  document.getElementById('mJoin').innerText = `Joined: ${s.joinDate} • ${m} Months Billed`;
-  document.getElementById('mFee').innerText = `₹${s.fee}`;
-  document.getElementById('mPaid').innerText = `₹${paid}`;
-  document.getElementById('mDue').innerText = `₹${due}`;
-
-  let upi = document.getElementById('upiBtn');
-  upi.href = `upi://pay?pa=${db.settings.upi}&pn=${encodeURIComponent(db.settings.name)}&am=${due}&cu=INR`;
-  upi.innerText = due > 0 ? `💳 Pay Pending ₹${due} via UPI` : `✅ All Fee Cleared (₹0)`;
-
-  let h = document.getElementById('historyList');
-  h.innerHTML = s.payments.length ? s.payments.slice().reverse().map(p => 
-    `<li class="flex justify-between bg-slate-900 p-2 rounded border border-slate-700"><b class="text-emerald-400">+ ₹${p.amount}</b><span class="text-slate-400">${p.time}</span></li>`
-  ).join('') : `<li class="text-slate-500 italic">No payments yet.</li>`;
-
-  document.getElementById('profileModal').classList.remove('hidden');
-}
-
-function addPayment() {
-  let amt = Number(document.getElementById('payAmt').value);
-  if (!amt) return;
-  let s = db.students.find(x => x.id === activeId);
-  let now = new Date();
-  let time = now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) + ', ' + now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
-  s.payments.push({ amount: amt, time });
-  document.getElementById('payAmt').value = '';
-  saveDb(); openProfile(activeId);
-}
-
-function sendWhatsApp() {
-  let s = db.students.find(x => x.id === activeId);
-  let { m, paid, due } = calcFee(s);
-  let text = `Namaste 🙏,\n*${db.settings.name}* Fee Update:\n👨‍🎓 Student: *${s.name}*\n📅 Joined: ${s.joinDate} (${m} Mo)\n✅ Paid: ₹${paid}\n🚨 *Pending Due: ₹${due}*\nKripya UPI ID *${db.settings.upi}* par fee jama karein.`;
-  let ph = (s.phone || "").replace(/\D/g, '');
-  let url = (ph.length === 10 ? `https://wa.me/91${ph}` : `https://wa.me/`) + `?text=${encodeURIComponent(text)}`;
-  window.open(url, '_blank');
-}
-
-function deleteStu() {
-  db.students = db.students.filter(x => x.id !== activeId);
-  saveDb(); toggleBox('profileModal'); msg("🗑️ Profile Deleted!");
-}
-
-function saveSettings() {
-  db.settings.name = document.getElementById('setTuition').value.trim() || db.settings.name;
-  db.settings.upi = document.getElementById('setUpi').value.trim() || db.settings.upi;
-  db.settings.pin = document.getElementById('setPin').value.trim() || "1234";
-  saveDb(); toggleBox('settingsBody'); msg("✅ Settings Saved!");
-}
-
-function handleRoleSwitch() {
-  if (isAdmin) setRole(false);
-  else { document.getElementById('pinInput').value = ''; toggleBox('pinModal'); }
-}
-
-function verifyPin() {
-  if (document.getElementById('pinInput').value === db.settings.pin) {
-    setRole(true); toggleBox('pinModal'); msg("🔓 Admin Unlocked!");
-  } else msg("❌ Wrong PIN! (Default: 1234)");
-}
-
-function setRole(admin) {
-  isAdmin = admin;
-  document.getElementById('adminPanel').classList.toggle('hidden', !admin);
-  document.getElementById('adminControls').classList.toggle('hidden', !admin);
-  document.getElementById('delBox').classList.toggle('hidden', !admin);
-  document.getElementById('modeText').innerText = admin ? "Mode: Admin (Unlocked 🔓)" : "Mode: Parent View (Read-Only 👁️)";
-  document.getElementById('roleBtn').innerText = admin ? "Lock Parent View 🔒" : "Admin Unlock 🔑";
-}
-
-saveDb();
-</script>
-</body>
-</html>
-<!-- Firebase Database Connection -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // Aapki Firebase Keys
   const firebaseConfig = {
     apiKey: "AIzaSyC0gzobslaGZdrwNpHNAamoaAzOlX_30Cg",
     authDomain: "tuition-traker.firebaseapp.com",
@@ -280,16 +129,199 @@ saveDb();
     appId: "1:194003123154:web:bfa0fb5a5bb394abc9260b"
   };
 
-  // Firebase Chalu Karein
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  
-  // Database ko app ke dusre hisso ke liye available karein
-  window.db = db;
-  window.collection = collection;
-  window.getDocs = getDocs;
-  window.doc = doc;
-  window.setDoc = setDoc;
-  
-  console.log("Firebase Connected Successfully!");
+  const firestoreDb = getFirestore(app);
+  const docRef = doc(firestoreDb, "tuition_data", "main_store");
+
+  let db = {
+    settings: { name: "Smart Tuition Tracker", upi: "yourname@ybl", pin: "1234" },
+    students: [
+      { id: 1, name: "Rajkishor Kumar", phone: "", joinDate: "2024-12-01", fee: 500, payments: [
+        { amount: 500, time: "05 Dec 2024, 04:30 PM" },
+        { amount: 500, time: "30 Oct 2026, 09:39 PM" }
+      ]}
+    ]
+  };
+
+  try {
+    let saved = localStorage.getItem('tuition_v4');
+    if (saved) db = JSON.parse(saved);
+  } catch(e) {}
+
+  let isAdmin = true, activeId = null;
+
+  // Real-Time Cloud Listener
+  onSnapshot(docRef, (snap) => {
+    const statusBadge = document.getElementById('cloudStatus');
+    if (snap.exists()) {
+      db = snap.data();
+      try { localStorage.setItem('tuition_v4', JSON.stringify(db)); } catch(e) {}
+      statusBadge.innerText = "☁️ Cloud Live";
+      statusBadge.className = "text-[10px] bg-emerald-900/80 px-2 py-0.5 rounded-full text-emerald-300 font-bold";
+      updateUI();
+    } else {
+      // Pehli baar local data ko cloud par upload karein
+      setDoc(docRef, db).then(() => {
+        statusBadge.innerText = "☁️ Cloud Synced";
+      });
+    }
+  }, (err) => {
+    console.error("Firebase Error:", err);
+    document.getElementById('cloudStatus').innerText = "⚠️ Offline Mode";
+  });
+
+  function updateUI() {
+    document.getElementById('navTitle').innerText = "📚 " + db.settings.name;
+    document.getElementById('setTuition').value = db.settings.name;
+    document.getElementById('setUpi').value = db.settings.upi;
+    document.getElementById('setPin').value = db.settings.pin;
+    renderList();
+    if (activeId && !document.getElementById('profileModal').classList.contains('hidden')) {
+      let exists = db.students.some(x => x.id === activeId);
+      if (exists) window.openProfile(activeId);
+      else window.toggleBox('profileModal');
+    }
+  }
+
+  async function saveDb() {
+    try { localStorage.setItem('tuition_v4', JSON.stringify(db)); } catch(e) {}
+    updateUI();
+    try {
+      await setDoc(docRef, db);
+    } catch(e) {
+      console.error("Cloud Save Error:", e);
+      msg("⚠️ Local saved, Cloud error!");
+    }
+  }
+
+  function msg(t) {
+    let b = document.getElementById('msgBox');
+    b.innerText = t; b.classList.remove('hidden');
+    setTimeout(() => b.classList.add('hidden'), 2500);
+  }
+
+  window.toggleBox = function(id) {
+    document.getElementById(id).classList.toggle('hidden');
+  };
+
+  function calcFee(s) {
+    let j = new Date(s.joinDate), n = new Date();
+    let m = isNaN(j) ? 1 : (n.getFullYear() - j.getFullYear()) * 12 + (n.getMonth() - j.getMonth()) + (n.getDate() >= j.getDate() ? 1 : 0);
+    m = Math.max(1, m);
+    let paid = (s.payments || []).reduce((a, b) => a + b.amount, 0);
+    let due = Math.max(0, (m * s.fee) - paid);
+    return { m, paid, due };
+  }
+
+  window.renderList = function() {
+    let box = document.getElementById('studentList');
+    let q = document.getElementById('searchBox').value.toLowerCase();
+    box.innerHTML = '';
+    (db.students || []).filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
+      let { m, paid, due } = calcFee(s);
+      let badge = due > 0 ? `<span class="bg-red-500/20 text-red-300 text-xs font-bold px-2 py-1 rounded-full">Due: ₹${due}</span>`
+                          : `<span class="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-2 py-1 rounded-full">Clear ₹0</span>`;
+      box.innerHTML += `
+        <div onclick="openProfile(${s.id})" class="bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex justify-between items-center cursor-pointer">
+          <div>
+            <h3 class="font-bold text-white text-sm">${s.name}</h3>
+            <p class="text-[11px] text-slate-400">Joined: ${s.joinDate} (${m} Mo) • Fee: ₹${s.fee}</p>
+          </div>
+          <div class="text-right">${badge}<p class="text-[11px] text-indigo-400 font-bold mt-1">Open →</p></div>
+        </div>`;
+    });
+  };
+
+  window.addStudent = function() {
+    let name = document.getElementById('stuName').value.trim();
+    let phone = document.getElementById('stuPhone').value.trim();
+    let joinDate = document.getElementById('joinDate').value;
+    let fee = Number(document.getElementById('monthlyFee').value);
+    if (!name || !joinDate || !fee) return msg("⚠️ Naam, Date aur Fee teeno bharein!");
+    db.students.push({ id: Date.now(), name, phone, joinDate, fee, payments: [] });
+    document.getElementById('stuName').value = '';
+    document.getElementById('stuPhone').value = '';
+    document.getElementById('monthlyFee').value = '';
+    saveDb(); msg("☁️ Student Cloud Par Save Ho Gaya!");
+  };
+
+  window.openProfile = function(id) {
+    activeId = id;
+    let s = db.students.find(x => x.id === id);
+    if (!s) return;
+    let { m, paid, due } = calcFee(s);
+    document.getElementById('mName').innerText = s.name;
+    document.getElementById('mJoin').innerText = `Joined: ${s.joinDate} • ${m} Months Billed`;
+    document.getElementById('mFee').innerText = `₹${s.fee}`;
+    document.getElementById('mPaid').innerText = `₹${paid}`;
+    document.getElementById('mDue').innerText = `₹${due}`;
+
+    let upi = document.getElementById('upiBtn');
+    upi.href = `upi://pay?pa=${db.settings.upi}&pn=${encodeURIComponent(db.settings.name)}&am=${due}&cu=INR`;
+    upi.innerText = due > 0 ? `💳 Pay Pending ₹${due} via UPI` : `✅ All Fee Cleared (₹0)`;
+
+    let h = document.getElementById('historyList');
+    h.innerHTML = (s.payments && s.payments.length) ? s.payments.slice().reverse().map(p => 
+      `<li class="flex justify-between bg-slate-900 p-2 rounded border border-slate-700"><b class="text-emerald-400">+ ₹${p.amount}</b><span class="text-slate-400">${p.time}</span></li>`
+    ).join('') : `<li class="text-slate-500 italic">No payments yet.</li>`;
+
+    document.getElementById('profileModal').classList.remove('hidden');
+  };
+
+  window.addPayment = function() {
+    let amt = Number(document.getElementById('payAmt').value);
+    if (!amt) return;
+    let s = db.students.find(x => x.id === activeId);
+    let now = new Date();
+    let time = now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) + ', ' + now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+    if (!s.payments) s.payments = [];
+    s.payments.push({ amount: amt, time });
+    document.getElementById('payAmt').value = '';
+    saveDb(); window.openProfile(activeId); msg("☁️ Payment Cloud Par Update Ho Gayi!");
+  };
+
+  window.sendWhatsApp = function() {
+    let s = db.students.find(x => x.id === activeId);
+    let { m, paid, due } = calcFee(s);
+    let text = `Namaste 🙏,\n*${db.settings.name}* Fee Update:\n👨‍🎓 Student: *${s.name}*\n📅 Joined: ${s.joinDate} (${m} Mo)\n✅ Paid: ₹${paid}\n🚨 *Pending Due: ₹${due}*\nKripya UPI ID *${db.settings.upi}* par fee jama karein.`;
+    let ph = (s.phone || "").replace(/\D/g, '');
+    let url = (ph.length === 10 ? `https://wa.me/91${ph}` : `https://wa.me/`) + `?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  window.deleteStu = function() {
+    db.students = db.students.filter(x => x.id !== activeId);
+    saveDb(); window.toggleBox('profileModal'); msg("🗑️ Profile Deleted from Cloud!");
+  };
+
+  window.saveSettings = function() {
+    db.settings.name = document.getElementById('setTuition').value.trim() || db.settings.name;
+    db.settings.upi = document.getElementById('setUpi').value.trim() || db.settings.upi;
+    db.settings.pin = document.getElementById('setPin').value.trim() || "1234";
+    saveDb(); window.toggleBox('settingsBody'); msg("☁️ Settings Cloud Par Save Ho Gayi!");
+  };
+
+  window.handleRoleSwitch = function() {
+    if (isAdmin) setRole(false);
+    else { document.getElementById('pinInput').value = ''; window.toggleBox('pinModal'); }
+  };
+
+  window.verifyPin = function() {
+    if (document.getElementById('pinInput').value === db.settings.pin) {
+      setRole(true); window.toggleBox('pinModal'); msg("🔓 Admin Unlocked!");
+    } else msg("❌ Wrong PIN! (Default: 1234)");
+  };
+
+  function setRole(admin) {
+    isAdmin = admin;
+    document.getElementById('adminPanel').classList.toggle('hidden', !admin);
+    document.getElementById('adminControls').classList.toggle('hidden', !admin);
+    document.getElementById('delBox').classList.toggle('hidden', !admin);
+    document.getElementById('modeText').innerText = admin ? "Mode: Admin (Unlocked 🔓)" : "Mode: Parent View (Read-Only 👁️)";
+    document.getElementById('roleBtn').innerText = admin ? "Lock Parent View 🔒" : "Admin Unlock 🔑";
+  }
+
+  updateUI();
 </script>
+</body>
+</html>
