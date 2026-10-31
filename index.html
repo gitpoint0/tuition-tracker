@@ -38,7 +38,7 @@
     </div>
 
     <a id="spUpiBtn" href="#" class="block w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-emerald-900/40">
-      💳 Pay via UPI (PhonePe / GPay / Paytm)
+      💳 Pay via UPI (PhonePe / GPay)
     </a>
 
     <div class="pt-2 border-t border-slate-700/60 text-left">
@@ -125,7 +125,7 @@
         </div>
       </div>
       <button onclick="sendWhatsApp()" class="w-full bg-green-600 text-white py-2.5 rounded-xl font-bold text-xs">
-        📲 Send WhatsApp Fee Reminder (Private Link)
+        📲 Send WhatsApp Fee Reminder
       </button>
     </div>
 
@@ -164,7 +164,6 @@
     students: []
   };
 
-  // Hamesha locked Parent View se start hoga security ke liye
   let isAdmin = false, activeId = null;
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -191,7 +190,6 @@
     document.getElementById('setUpi').value = db.settings.upi || "";
     document.getElementById('setPin').value = db.settings.pin || "1234";
 
-    // Agar direct student link khola gaya hai
     if (requestedStudentId && !isAdmin) {
       let st = (db.students || []).find(x => String(x.id) === String(requestedStudentId));
       if (st) {
@@ -202,7 +200,7 @@
 
     document.getElementById('singleParentCard').classList.add('hidden');
     document.getElementById('generalPortalArea').classList.remove('hidden');
-    renderList();
+    window.renderList();
   }
 
   function showPrivateStudentCard(s) {
@@ -233,12 +231,7 @@
 
   async function saveDb() {
     updateUI();
-    try {
-      await setDoc(docRef, db);
-    } catch(e) {
-      console.error(e);
-      msg("⚠️ Cloud Save Error!");
-    }
+    try { await setDoc(docRef, db); } catch(e) { console.error(e); }
   }
 
   function msg(t) {
@@ -327,25 +320,13 @@
     saveDb(); window.openProfile(activeId); msg("☁️ Payment Updated!");
   };
 
-    window.sendWhatsApp = function() {
+  window.sendWhatsApp = function() {
     let s = db.students.find(x => x.id === activeId);
     let { due } = calcFee(s);
     
-    // Student ka private link
     let directPayLink = `${window.location.origin}${window.location.pathname}?student=${s.id}`;
 
-    // Pure Hindi (Devanagari) + English Message
     let text = `नमस्ते / Hello 🙏\n\n*${s.name}* की बकाया ट्यूशन फीस *₹${due}* है।\n(Pending tuition fee for *${s.name}* is *₹${due}*)\n\nऑनलाइन फीस जमा करने के लिए नीचे दिए गए लिंक पर क्लिक करें:\n(Click the link below to pay directly via PhonePe/GPay/Paytm):\n\n🔗 ${directPayLink}\n\nधन्यवाद / Thank you!`;
-
-    let ph = (s.phone || "").replace(/\D/g, '');
-    let url = (ph.length === 10 ? `https://wa.me/91${ph}` : `https://wa.me/`) + `?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
-  };
-  
-    // Har student ka unique secret direct invoice link
-    let directPayLink = `${window.location.origin}${window.location.pathname}?student=${s.id}`;
-
-    let text = `Namaste 🙏\n\n*${s.name}* ki pending tuition fee *₹${due}* hai.\n\nKripya is link par click karke seedhe PhonePe/GPay se payment karein 👇\n\n🔗 ${directPayLink}`;
 
     let ph = (s.phone || "").replace(/\D/g, '');
     let url = (ph.length === 10 ? `https://wa.me/91${ph}` : `https://wa.me/`) + `?text=${encodeURIComponent(text)}`;
@@ -385,7 +366,6 @@
     updateUI();
   }
 
-  // Pehli baar load hone par Parent View lock rahega
   setRole(false);
 </script>
 </body>
