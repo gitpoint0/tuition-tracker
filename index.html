@@ -27,10 +27,11 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
 </head>
 <body>
 <header>
- <div><h1>📚 Smart Tuition Tracker</h1><small>Basic fee management</small></div>
+ <div><h1 id="appTitle">📚 Smart Tuition Tracker</h1><small id="appSub">Basic fee management</small></div>
  <span id="cloudStatus" class="status warn">Connecting to cloud…</span>
 </header>
-<main>
+
+<main id="adminMain">
  <div class="grid">
   <div class="card"><div class="stat-label">Total students</div><div id="totalStudents" class="stat-value">0</div></div>
   <div class="card"><div class="stat-label">Monthly fee total</div><div id="monthlyTotal" class="stat-value">₹0</div></div>
@@ -78,6 +79,30 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
  <footer>Smart Tuition Tracker • Keep a recent backup before major changes.</footer>
 </main>
 
+<!-- Parent Read-Only View (Opens when shared link is clicked) -->
+<main id="parentMain" class="hidden">
+ <section class="panel">
+  <div class="panel-head">
+   <div>
+    <h2 id="pStudentName">Student Fee Card</h2>
+    <div id="pStudentSub" class="tiny muted" style="margin-top:4px">Loading details…</div>
+   </div>
+   <span id="pBadge" class="pill clear">Checking…</span>
+  </div>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">
+   <div class="card"><div class="stat-label">Monthly Fee</div><div id="pFee" class="stat-value" style="font-size:18px">₹0</div></div>
+   <div class="card"><div class="stat-label">Total Paid</div><div id="pPaid" class="stat-value" style="font-size:18px;color:#55dda9">₹0</div></div>
+   <div class="card"><div class="stat-label">Pending Due</div><div id="pDue" class="stat-value" style="font-size:18px;color:#ff8994">₹0</div></div>
+  </div>
+  <div class="actions" style="margin-top:16px">
+   <a id="pUpiLink" class="button green" href="#" style="display:none">💳 Pay pending fee via UPI</a>
+  </div>
+  <h2 style="margin:20px 0 8px">Payment history</h2>
+  <div id="pHistory"><div class="empty">Loading payment history…</div></div>
+ </section>
+ <footer>Parent View • Smart Tuition Tracker</footer>
+</main>
+
 <div id="profileModal" class="modal hidden">
  <div class="modal-box">
   <div class="modal-head"><div><h2 id="modalName">Student</h2><div id="modalSub" class="tiny muted"></div></div><button id="closeModal" class="secondary" type="button">✕</button></div>
@@ -97,8 +122,9 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
   </section>
   <div class="actions" style="margin-top:12px">
    <a id="upiLink" class="button" href="#" style="display:none">Pay pending fee via UPI</a>
-   <button id="whatsappBtn" class="secondary" type="button">WhatsApp reminder</button>
-   <button id="editBtn" class="secondary" type="button">Edit student</button>
+   <button id="whatsappBtn" class="secondary" type="button">💬 WhatsApp reminder</button>
+   <button id="shareLinkBtn" class="secondary" type="button">🔗 Share parent link</button>
+   <button id="editBtn" class="secondary" type="button">✏️ Edit student</button>
   </div>
   <h2 style="margin:18px 0 8px">Payment history</h2>
   <div id="paymentHistory"></div>
@@ -122,9 +148,8 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* Existing Firebase project configuration */
 const firebaseConfig = {
  apiKey: "AIzaSyC0gzobslaGZdrwNpHNAamoaAzOlX_30Cg",
  authDomain: "tuition-traker.firebaseapp.com",
@@ -136,6 +161,9 @@ const firebaseConfig = {
 const CACHE_KEY = "smartTuitionTracker_v2_cache";
 const PENDING_KEY = "smartTuitionTracker_v2_pending";
 const DOC_PATH = ["tuition_data","main_store"];
+
+const urlParams = new URLSearchParams(window.location.search);
+const parentStudentId = urlParams.get("student");
 
 let db = {settings:{name:"Smart Tuition",upi:""},students:[]};
 let activeStudentId = null;
@@ -217,7 +245,54 @@ function totals(s){
  return {billed,paid,due:Math.max(0,billed-paid),credit:Math.max(0,paid-billed),months:monthsDue(s)};
 }
 
+function getParentShareUrl(studentId){
+ const url = new URL(window.location.href);
+ url.search = "";
+ url.searchParams.set("student", studentId);
+ return url.toString();
+}
+
+function renderParentView(){
+ $("adminMain").classList.add("hidden");
+ $("parentMain").classList.remove("hidden");
+ $("appTitle").textContent = "📚 " + (db.settings.name || "Smart Tuition");
+ $("appSub").textContent = "Parent Fee Portal";
+
+ const s = (db.students||[]).find(x => x.id === parentStudentId);
+ if(!s){
+  $("pStudentName").textContent = "Student record not found";
+  $("pStudentSub").textContent = "Please check the link shared by your teacher or wait for cloud sync.";
+  $("pBadge").textContent = "Not found";
+  $("pBadge").className = "pill due";
+  return;
+ }
+ const t = totals(s);
+ $("pStudentName").textContent = s.name;
+ $("pStudentSub").textContent = `Joined ${s.joinDate} · ${t.months} fee cycle(s) billed`;
+ $("pFee").textContent = money(s.fee);
+ $("pPaid").textContent = money(t.paid);
+ $("pDue").textContent = money(t.due);
+ $("pBadge").textContent = t.due > 0 ? "Due: " + money(t.due) : "Fee Clear";
+ $("pBadge").className = "pill " + (t.due > 0 ? "due" : "clear");
+
+ if(t.due > 0 && db.settings.upi){
+  const params = new URLSearchParams({pa:db.settings.upi, pn:db.settings.name||"Tuition", am:String(t.due), cu:"INR", tn:`Tuition fee - ${s.name}`});
+  $("pUpiLink").href = "upi://pay?" + params.toString();
+  $("pUpiLink").style.display = "inline-flex";
+ } else {
+  $("pUpiLink").style.display = "none";
+ }
+
+ $("pHistory").innerHTML = (s.payments||[]).length
+  ? s.payments.slice().reverse().map(p=>`<div class="history"><div><b>${money(p.amount)}</b><div class="tiny muted">${safe(p.mode)}${p.note?" · "+safe(p.note):""}</div></div><span class="tiny muted">${safe(new Date(p.time).toLocaleString("en-IN"))}</span></div>`).join("")
+  : '<div class="empty">No payment records yet.</div>';
+}
+
 function render(){
+ if(parentStudentId){
+  renderParentView();
+  return;
+ }
  const students=db.students||[];
  const totalPaid=students.reduce((a,s)=>a+totals(s).paid,0);
  const totalDue=students.reduce((a,s)=>a+totals(s).due,0);
@@ -244,7 +319,7 @@ function saveAll(){
  persistLocal();
  localStorage.setItem(PENDING_KEY,"1");
  if(!cloudReady || !firestoreDb){
-  setStatus("Saved on this device · waiting for cloud","warn");
+  setStatus("Saved on device · offline","warn");
   return;
  }
  setStatus("Syncing to cloud…","warn");
@@ -255,7 +330,7 @@ function saveAll(){
    setStatus("☁ Cloud synced","ok");
   }catch(e){
    console.error("Cloud save failed:",e);
-   setStatus("Cloud unavailable · local copy saved","bad");
+   setStatus("Cloud error · saved locally","bad");
   }
  });
 }
@@ -266,60 +341,4 @@ function openProfile(id){
  $("modalName").textContent=s.name;
  $("modalSub").textContent=`Joined ${s.joinDate} · ${t.months} fee cycle(s) billed`;
  $("mFee").textContent=money(s.fee); $("mPaid").textContent=money(t.paid); $("mDue").textContent=money(t.due);
- $("paymentHistory").innerHTML=(s.payments||[]).length?s.payments.slice().reverse().map(p=>`<div class="history"><div><b>${money(p.amount)}</b><div class="tiny muted">${safe(p.mode)}${p.note?" · "+safe(p.note):""}</div></div><span class="tiny muted">${safe(new Date(p.time).toLocaleString("en-IN"))}</span></div>`).join(""):'<div class="empty">No payment records yet.</div>';
- if(t.due>0 && db.settings.upi){
-  const params=new URLSearchParams({pa:db.settings.upi,pn:db.settings.name||"Tuition",am:String(t.due),cu:"INR",tn:`Tuition fee - ${s.name}`});
-  $("upiLink").href="upi://pay?"+params.toString(); $("upiLink").style.display="inline-flex";
- }else{$("upiLink").style.display="none";}
- $("profileModal").classList.remove("hidden");
-}
-
-$("studentForm").addEventListener("submit",e=>{
- e.preventDefault();
- const name=$("stuName").value.trim(),phone=$("stuPhone").value.trim(),joinDate=$("joinDate").value,fee=Number($("monthlyFee").value);
- if(!name||!joinDate||!Number.isFinite(fee)||fee<=0){toast("Please enter a name, joining date and a valid fee.",true);return;}
- db.students.push({id:crypto.randomUUID(),name,phone,joinDate,fee,payments:[]});
- $("studentForm").reset(); $("joinDate").value=todayISO(); saveAll(); render(); toast("Student saved.");
-});
-
-$("paymentForm").addEventListener("submit",e=>{
- e.preventDefault(); const s=db.students.find(x=>x.id===activeStudentId); if(!s)return;
- const amount=Number($("payAmount").value);
- if(!Number.isFinite(amount)||amount<=0){toast("Enter a payment amount greater than zero.",true);return;}
- s.payments=s.payments||[];
- s.payments.push({id:crypto.randomUUID(),amount,mode:$("payMode").value,note:$("payNote").value.trim(),time:new Date().toISOString()});
- $("paymentForm").reset(); saveAll(); render(); openProfile(activeStudentId); toast("Payment recorded.");
-});
-
-$("settingsForm").addEventListener("submit",e=>{
- e.preventDefault(); db.settings.name=$("tuitionName").value.trim()||"Smart Tuition"; db.settings.upi=$("upiId").value.trim(); saveAll(); toast("Settings saved.");
-});
-
-$("searchBox").addEventListener("input",render);
-$("closeModal").addEventListener("click",()=>$("profileModal").classList.add("hidden"));
-$("profileModal").addEventListener("click",e=>{if(e.target===$("profileModal"))$("profileModal").classList.add("hidden");});
-
-$("editBtn").addEventListener("click",()=>{
- const s=db.students.find(x=>x.id===activeStudentId);if(!s)return;
- $("editName").value=s.name;$("editPhone").value=s.phone;$("editJoin").value=s.joinDate;$("editFee").value=s.fee;
- $("editModal").classList.remove("hidden");
-});
-
-$("closeEdit").addEventListener("click",()=>$("editModal").classList.add("hidden"));
-
-$("editForm").addEventListener("submit",e=>{
- e.preventDefault();const s=db.students.find(x=>x.id===activeStudentId);if(!s)return;
- const fee=Number($("editFee").value);
- if(!$("editName").value.trim()||!$("editJoin").value||!Number.isFinite(fee)||fee<=0){toast("Please check the student details.",true);return;}
- s.name=$("editName").value.trim();s.phone=$("editPhone").value.trim();s.joinDate=$("editJoin").value;s.fee=fee;
- saveAll();render();$("editModal").classList.add("hidden");openProfile(activeStudentId);toast("Student details updated.");
-});
-
-$("whatsappBtn").addEventListener("click",()=>{
- const s=db.students.find(x=>x.id===activeStudentId);if(!s)return;
- if(!s.phone){toast("Add the parent's phone number first.",true);return;}
- const due=totals(s).due;
- const msg=`Namaste 🙏 ${s.name} ki pending tuition fee ${money(due)} hai. Kripya fee jama kar dein. Dhanyavaad.`;
- const digits=s.phone.replace(/\D/g,"");
- const phone=digits.length===10?"91"+digits:digits;
- window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,"_blank","n
+ $("paymentHistory").innerHTML=(s.payments||[]).length?s.payments.slice().reverse().map(p=>`<div class="history"><div><b>${money(p.amount)}</b><div class="tiny muted">${safe(p.mode)}${p.note?" · "+safe(p.note):""}</div></div><span class="tiny muted">${safe(new Date(p.time).toLocaleString("en-IN"))}</span></div>`)
