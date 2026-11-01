@@ -1,268 +1,347 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b1020">
-<title>Smart Tuition Tracker — Basic</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Tuition Tracker</title>
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-:root{color-scheme:dark;--bg:#0b1020;--panel:#141c30;--panel2:#10182a;--line:#293650;--text:#eef3ff;--muted:#9eabc3;--blue:#477dff;--green:#20b981;--red:#f06b75;--amber:#f5b94c}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 10% 0%,#1b2d55 0,transparent 32%),radial-gradient(circle at 100% 100%,#30204c 0,transparent 30%),var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
-header{position:sticky;top:0;z-index:5;background:#0b1020eF;border-bottom:1px solid var(--line);backdrop-filter:blur(14px);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-h1{font-size:18px;margin:0}header small{color:var(--muted)}main{max-width:1000px;margin:24px auto;padding:0 16px 60px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card,.panel{background:linear-gradient(145deg,#18243b,#111a2c);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 10px 30px #0003}
-.stat-label{color:var(--muted);font-size:12px}.stat-value{font-size:25px;font-weight:800;margin-top:5px}
-.panel{margin-top:16px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}h2{font-size:16px;margin:0}
-button,.button{border:0;border-radius:11px;padding:10px 14px;font-weight:700;cursor:pointer;background:var(--blue);color:white;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px}
-button.secondary,.button.secondary{background:#273650;border:1px solid #3a4a67}button.green{background:#12875f}button.danger{background:#8d3541}button:disabled{opacity:.5;cursor:not-allowed}
-input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #35445f;background:#0d1526;color:var(--text);outline:none}input:focus,select:focus{border-color:#6d9aff}
-label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field.full{grid-column:1/-1}
-.actions{display:flex;gap:8px;flex-wrap:wrap}.muted{color:var(--muted)}.tiny{font-size:12px}.status{font-size:11px;padding:5px 9px;border-radius:20px;background:#26344c;color:#c8d5ee;white-space:nowrap}.status.ok{background:#123c34;color:#8df0c8}.status.warn{background:#49391c;color:#ffda8b}.status.bad{background:#49232c;color:#ffb2ba}
-.search{max-width:320px}.student{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px;border:1px solid var(--line);border-radius:14px;background:#0d1628;margin-top:9px}.student h3{font-size:14px;margin:0 0 4px}.student .right{text-align:right}.pill{font-size:11px;border-radius:20px;padding:5px 8px;display:inline-block}.due{background:#49232c;color:#ffb2ba}.clear{background:#123c34;color:#8df0c8}
-.hidden{display:none!important}.modal{position:fixed;inset:0;background:#000a;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px}.modal-box{width:min(560px,100%);max-height:90vh;overflow:auto;background:#141e32;border:1px solid #3b4a65;border-radius:20px;padding:18px;box-shadow:0 25px 80px #0009}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.history{padding:9px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
-.notice{padding:11px 13px;border:1px solid #705d2f;background:#332a19;color:#ffe0a0;border-radius:12px;font-size:12px;line-height:1.5;margin-top:14px}
-.empty{padding:25px;text-align:center;color:var(--muted)}footer{color:var(--muted);font-size:11px;text-align:center;margin-top:20px}
-@media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}header{align-items:flex-start}h1{font-size:16px}.student{align-items:flex-start}.student .right{min-width:100px}}
+  body {
+    background: #090d16;
+    overflow-x: hidden;
+  }
+  .bg-blob-1 {
+    position: fixed; top: -10%; left: -10%; width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(59,130,246,0.5) 0%, rgba(37,99,235,0) 70%);
+    border-radius: 50%; filter: blur(30px); z-index: -1;
+    animation: floatBlob 8s infinite alternate ease-in-out;
+  }
+  .bg-blob-2 {
+    position: fixed; bottom: -10%; right: -10%; width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(147,51,234,0.45) 0%, rgba(126,34,206,0) 70%);
+    border-radius: 50%; filter: blur(35px); z-index: -1;
+    animation: floatBlob 10s infinite alternate-reverse ease-in-out;
+  }
+  @keyframes floatBlob {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, 50px) scale(1.15); }
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  }
+  .glass-input {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
+  }
+  .glass-input:focus {
+    outline: none;
+    border-color: rgba(96, 165, 250, 0.6);
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .glass-nav {
+    background: rgba(9, 13, 22, 0.75);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .animate-card { animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  @keyframes popModal {
+    0% { opacity: 0; transform: scale(0.85); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  .animate-modal { animation: popModal 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 15px rgba(37, 99, 235, 0.4); }
+    50% { box-shadow: 0 0 28px rgba(59, 130, 246, 0.8); }
+  }
+  .glow-btn { animation: pulseGlow 2.2s infinite; }
 </style>
 </head>
-<body>
-<header>
- <div><h1>📚 Smart Tuition Tracker</h1><small>Basic fee management</small></div>
- <span id="cloudStatus" class="status warn">Connecting to cloud…</span>
-</header>
-<main>
- <div class="grid">
-  <div class="card"><div class="stat-label">Total students</div><div id="totalStudents" class="stat-value">0</div></div>
-  <div class="card"><div class="stat-label">Monthly fee total</div><div id="monthlyTotal" class="stat-value">₹0</div></div>
-  <div class="card"><div class="stat-label">Total collected</div><div id="totalPaid" class="stat-value">₹0</div></div>
-  <div class="card"><div class="stat-label">Total pending</div><div id="totalDue" class="stat-value">₹0</div></div>
- </div>
+<body class="text-slate-100 min-h-screen font-sans pb-12">
 
- <section class="panel">
-  <div class="panel-head"><h2>➕ Add student</h2><span class="tiny muted">Admin workspace</span></div>
-  <form id="studentForm" class="form-grid">
-   <div class="field"><label for="stuName">Student name *</label><input id="stuName" maxlength="80" required placeholder="Student full name"></div>
-   <div class="field"><label for="stuPhone">Parent phone / WhatsApp</label><input id="stuPhone" inputmode="tel" maxlength="15" placeholder="10-digit mobile number"></div>
-   <div class="field"><label for="joinDate">Joining date *</label><input id="joinDate" type="date" required></div>
-   <div class="field"><label for="monthlyFee">Monthly fee (₹) *</label><input id="monthlyFee" type="number" min="1" step="1" required placeholder="e.g. 500"></div>
-   <div class="field full"><button type="submit">Save student</button></div>
-  </form>
- </section>
+<div class="bg-blob-1"></div>
+<div class="bg-blob-2"></div>
 
- <section class="panel">
-  <div class="panel-head"><h2>👨‍🎓 Students & fee status</h2><input id="searchBox" class="search" placeholder="Search by student name…"></div>
-  <div id="studentList"><div class="empty">Loading student records…</div></div>
- </section>
-
- <section class="panel">
-  <div class="panel-head"><h2>🛟 Backup & restore</h2></div>
-  <p class="tiny muted">Download a copy of your tuition records regularly. Keep backup files somewhere safe, such as another device or a trusted cloud drive.</p>
-  <div class="actions">
-   <button id="backupBtn" class="secondary" type="button">⬇ Download backup</button>
-   <label class="button secondary" for="restoreFile">↥ Restore backup</label>
-   <input id="restoreFile" type="file" accept="application/json,.json" class="hidden">
+<nav class="glass-nav p-3.5 shadow-lg flex justify-between items-center sticky top-0 z-10">
+  <div>
+    <h1 id="navTitle" class="text-base font-bold text-white tracking-wide">📚 Smart Tuition Tracker</h1>
+    <div class="flex items-center gap-2 mt-0.5">
+      <p id="modeText" class="text-[11px] text-blue-300">Mode: Parent View (Read-Only 👁️)</p>
+      <span id="cloudStatus" class="text-[9px] bg-white/10 px-2 py-0.5 rounded-full text-blue-200 border border-white/10">⏳ Connecting...</span>
+    </div>
   </div>
-  <div id="backupInfo" class="tiny muted" style="margin-top:10px">Local safety copy is updated when changes are saved on this device.</div>
-  <div class="notice"><b>Important:</b> Local backup is not a substitute for cloud security. Restoring a backup replaces the current student and payment data. Only restore a file you trust.</div>
- </section>
+  <button onclick="handleRoleSwitch()" id="roleBtn" class="bg-white/10 hover:bg-white/20 active:scale-90 text-white px-3 py-1.5 rounded-xl text-xs font-bold border border-white/15 transition-all">
+    Admin Unlock 🔑
+  </button>
+</nav>
 
- <section class="panel">
-  <div class="panel-head"><h2>⚙️ Tuition settings</h2></div>
-  <form id="settingsForm" class="form-grid">
-   <div class="field"><label for="tuitionName">Tuition name</label><input id="tuitionName" maxlength="80"></div>
-   <div class="field"><label for="upiId">UPI ID</label><input id="upiId" maxlength="100" placeholder="yourname@upi"></div>
-   <div class="field full"><button type="submit" class="secondary">Save settings</button></div>
-  </form>
-  <p class="tiny muted" style="margin-top:10px">Student deletion is intentionally not provided on the main screen. This basic version has no delete control, to reduce accidental data loss.</p>
- </section>
- <footer>Smart Tuition Tracker • Keep a recent backup before major changes.</footer>
-</main>
+<div class="max-w-xl mx-auto p-3 mt-3">
+  <div id="msgBox" class="hidden mb-4 p-3 rounded-2xl bg-emerald-500/80 backdrop-blur-md text-white text-xs font-bold text-center border border-emerald-400/40 animate-modal shadow-lg"></div>
 
-<div id="profileModal" class="modal hidden">
- <div class="modal-box">
-  <div class="modal-head"><div><h2 id="modalName">Student</h2><div id="modalSub" class="tiny muted"></div></div><button id="closeModal" class="secondary" type="button">✕</button></div>
-  <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:8px">
-   <div class="card"><div class="stat-label">Monthly</div><div id="mFee" class="stat-value" style="font-size:18px">₹0</div></div>
-   <div class="card"><div class="stat-label">Paid</div><div id="mPaid" class="stat-value" style="font-size:18px;color:#55dda9">₹0</div></div>
-   <div class="card"><div class="stat-label">Due</div><div id="mDue" class="stat-value" style="font-size:18px;color:#ff8994">₹0</div></div>
+  <!-- Direct Student View Card -->
+  <div id="singleParentCard" class="hidden glass-card p-6 rounded-3xl text-center space-y-5 mb-5 relative overflow-hidden animate-card">
+    <div class="absolute -top-12 -right-12 w-36 h-36 bg-blue-500 rounded-full blur-3xl opacity-30"></div>
+    <div class="absolute -bottom-12 -left-12 w-36 h-36 bg-purple-500 rounded-full blur-3xl opacity-30"></div>
+    <div class="relative z-10">
+      <span class="text-[10px] bg-blue-500/20 text-blue-200 px-3.5 py-1 rounded-full font-bold uppercase tracking-widest border border-blue-400/30">Fee Invoice</span>
+      <h2 id="spName" class="text-2xl font-extrabold text-white mt-3 drop-shadow"></h2>
+      <p class="text-xs text-blue-200/70 mt-1">Pending Tuition Fee</p>
+    </div>
+    <div class="relative z-10 bg-black/30 p-5 rounded-2xl border border-white/10 shadow-inner">
+      <p class="text-[11px] text-blue-200/70 uppercase tracking-widest mb-1">Total Due Amount</p>
+      <p id="spDueAmt" class="text-4xl font-black text-white drop-shadow-lg"></p>
+    </div>
+    <a id="spUpiBtn" onclick="playSound('success')" href="#" class="glow-btn relative z-10 block w-full bg-gradient-to-r from-blue-600 to-indigo-600 active:scale-95 transition-all text-white py-3.5 rounded-2xl font-bold text-sm border border-blue-400/40">
+      💳 Pay via UPI (PhonePe / GPay)
+    </a>
+    <div class="relative z-10 pt-4 border-t border-white/10 text-left">
+      <h4 class="text-[10px] font-bold text-blue-200/60 uppercase tracking-widest mb-3">Recent Payments</h4>
+      <ul id="spHistory" class="space-y-2 text-xs"></ul>
+    </div>
   </div>
-  <section style="margin-top:16px">
-   <h2 style="margin-bottom:10px">Record payment</h2>
-   <form id="paymentForm" class="form-grid">
-    <div class="field"><label for="payAmount">Amount (₹) *</label><input id="payAmount" type="number" min="1" step="1" required placeholder="Payment amount"></div>
-    <div class="field"><label for="payMode">Payment mode</label><select id="payMode"><option>Cash</option><option>UPI</option><option>Bank transfer</option><option>Other</option></select></div>
-    <div class="field full"><label for="payNote">Note (optional)</label><input id="payNote" maxlength="120" placeholder="e.g. September fee"></div>
-    <div class="field full"><button type="submit" class="green">Add payment</button></div>
-   </form>
-  </section>
-  <div class="actions" style="margin-top:12px">
-   <a id="upiLink" class="button" href="#" style="display:none">Pay pending fee via UPI</a>
-   <button id="whatsappBtn" class="secondary" type="button">WhatsApp reminder</button>
-   <button id="editBtn" class="secondary" type="button">Edit student</button>
+
+  <!-- Admin Portal Area -->
+  <div id="generalPortalArea">
+    <div id="adminPanel" class="hidden space-y-4 mb-6 animate-card">
+      <div class="glass-card p-4 rounded-2xl">
+        <div onclick="toggleBox('settingsBody')" class="flex justify-between items-center cursor-pointer">
+          <span class="text-xs font-bold text-blue-300">⚙️ Tuition, UPI & PIN Settings</span>
+          <span class="text-xs text-blue-200/50">Open ▼</span>
+        </div>
+        <div id="settingsBody" class="hidden mt-4 pt-4 border-t border-white/10 space-y-3">
+          <input id="setTuition" placeholder="Tuition Name" class="glass-input p-2.5 rounded-xl text-xs w-full transition-all placeholder-white/40">
+          <input id="setUpi" placeholder="Your UPI ID (e.g. 9876543210@ybl)" class="glass-input p-2.5 rounded-xl text-xs w-full transition-all placeholder-white/40">
+          <input id="setPin" placeholder="Admin PIN (Default: 1234)" class="glass-input p-2.5 rounded-xl text-xs w-full transition-all placeholder-white/40">
+          <button onclick="saveSettings()" class="bg-blue-600/80 active:scale-95 text-white rounded-xl p-2.5 text-xs font-bold w-full transition-all border border-blue-400/30">💾 Save Settings</button>
+        </div>
+      </div>
+
+      <div class="glass-card p-5 rounded-2xl space-y-3">
+        <h2 class="text-sm font-bold text-white mb-1">➕ Add New Student</h2>
+        <input id="stuName" placeholder="Student Name (e.g. Rajkishor Kumar)" class="glass-input p-3 rounded-xl text-sm w-full transition-all placeholder-white/40">
+        <input id="stuPhone" type="tel" placeholder="Parent WhatsApp No. (Optional)" class="glass-input p-3 rounded-xl text-sm w-full transition-all placeholder-white/40">
+        <div class="grid grid-cols-2 gap-3">
+          <input id="joinDate" type="date" class="glass-input p-3 rounded-xl text-sm w-full transition-all text-white/80">
+          <input id="monthlyFee" type="number" placeholder="Fee (₹)" class="glass-input p-3 rounded-xl text-sm w-full transition-all placeholder-white/40">
+        </div>
+        <button onclick="addStudent()" class="mt-2 bg-gradient-to-r from-purple-600 to-indigo-600 active:scale-95 transition-all text-white rounded-xl p-3 text-sm font-bold w-full shadow-lg border border-purple-400/30">
+          ✨ Save Student Profile
+        </button>
+      </div>
+    </div>
+
+    <input oninput="renderList()" id="searchBox" placeholder="🔍 Search student by name..." class="glass-input p-3.5 rounded-2xl text-sm w-full mb-4 shadow-lg placeholder-white/50 transition-all">
+    <h2 class="text-sm font-bold mb-3 text-white/80 tracking-wide pl-1">👨‍🎓 Students Profiles & Fee Status</h2>
+    <div id="studentList" class="space-y-3"></div>
   </div>
-  <h2 style="margin:18px 0 8px">Payment history</h2>
-  <div id="paymentHistory"></div>
- </div>
 </div>
 
-<div id="editModal" class="modal hidden">
- <div class="modal-box">
-  <div class="modal-head"><h2>Edit student</h2><button id="closeEdit" class="secondary" type="button">✕</button></div>
-  <form id="editForm" class="form-grid">
-   <div class="field"><label for="editName">Student name *</label><input id="editName" required maxlength="80"></div>
-   <div class="field"><label for="editPhone">Parent phone</label><input id="editPhone" maxlength="15"></div>
-   <div class="field"><label for="editJoin">Joining date *</label><input id="editJoin" type="date" required></div>
-   <div class="field"><label for="editFee">Monthly fee (₹) *</label><input id="editFee" type="number" min="1" step="1" required></div>
-   <div class="field full"><button type="submit">Save changes</button></div>
-  </form>
- </div>
+<!-- PIN Modal -->
+<div id="pinModal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+  <div class="glass-card rounded-3xl max-w-xs w-full p-6 text-center animate-modal">
+    <h3 class="text-sm font-bold text-white mb-1 tracking-wide">🔐 Enter Admin PIN</h3>
+    <p class="text-[10px] text-white/50 mb-4 uppercase tracking-widest">Default PIN: 1234</p>
+    <input id="pinInput" type="password" placeholder="••••" class="bg-black/40 border border-white/15 text-white text-center text-xl p-3 rounded-2xl w-full mb-5 focus:outline-none focus:border-blue-400 transition-all">
+    <div class="flex gap-3">
+      <button onclick="toggleBox('pinModal')" class="flex-1 bg-white/10 active:scale-95 py-2.5 rounded-xl text-xs font-bold transition-all border border-white/10">Cancel</button>
+      <button onclick="verifyPin()" class="flex-1 bg-blue-600 active:scale-95 py-2.5 rounded-xl text-xs font-bold transition-all border border-blue-400/40 shadow-lg">Unlock</button>
+    </div>
+  </div>
 </div>
 
-<div id="toast" class="hidden" style="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1c694f;border:1px solid #47bd91;padding:11px 16px;border-radius:12px;z-index:20;box-shadow:0 10px 30px #0008"></div>
+<!-- Profile Modal -->
+<div id="profileModal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-3 z-40">
+  <div class="glass-card rounded-3xl max-w-md w-full p-5 max-h-[90vh] overflow-y-auto relative overflow-hidden animate-modal">
+    <div class="absolute top-0 right-0 w-40 h-40 bg-blue-500 rounded-full blur-[50px] opacity-25 pointer-events-none"></div>
+    <div class="flex justify-between items-start border-b border-white/10 pb-3 relative z-10">
+      <div>
+        <h3 id="mName" class="text-xl font-bold text-white"></h3>
+        <p id="mFeeSummary" class="text-xs text-blue-200/70 mt-0.5"></p>
+      </div>
+      <button onclick="toggleBox('profileModal')" class="text-white/60 active:scale-90 text-xl font-bold px-2 transition-all">✕</button>
+    </div>
+    <div class="bg-black/30 p-4 rounded-2xl my-4 grid grid-cols-3 gap-2 text-center border border-white/10 relative z-10">
+      <div><p class="text-[10px] text-white/50 uppercase mb-1">Monthly</p><p id="mFee" class="font-bold text-sm text-white"></p></div>
+      <div><p class="text-[10px] text-white/50 uppercase mb-1">Paid</p><p id="mPaid" class="font-bold text-emerald-400 text-sm"></p></div>
+      <div><p class="text-[10px] text-white/50 uppercase mb-1">Due</p><p id="mDue" class="font-bold text-red-400 text-lg"></p></div>
+    </div>
+    <div id="adminControls" class="space-y-3 mb-4 relative z-10">
+      <div class="bg-black/25 p-4 rounded-2xl border border-blue-500/25">
+        <label class="block text-[11px] font-bold text-blue-300 uppercase tracking-wider mb-2">💰 Record Payment</label>
+        <div class="flex gap-2">
+          <input id="payAmt" type="number" placeholder="Amount (₹)" class="glass-input p-2.5 rounded-xl text-sm flex-1 placeholder-white/30">
+          <button onclick="addPayment()" class="bg-emerald-600 active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg border border-emerald-400/30">+ Add</button>
+        </div>
+      </div>
+      <button onclick="sendWhatsApp()" class="w-full bg-emerald-600/90 active:scale-95 text-white py-3 rounded-xl font-bold text-xs transition-all shadow-lg border border-emerald-400/30 flex items-center justify-center gap-2">
+        <span>📲</span> Send WhatsApp Reminder
+      </button>
+    </div>
+    <a id="upiBtn" onclick="playSound('success')" href="#" class="block text-center w-full bg-blue-600 active:scale-95 text-white py-3 rounded-xl font-bold text-xs mb-4 transition-all shadow-lg border border-blue-400/30 relative z-10">
+      💳 Pay Pending Fee via UPI
+    </a>
+    <h4 class="text-[10px] font-bold uppercase text-white/40 tracking-widest mb-2 relative z-10">📜 Payment History</h4>
+    <ul id="historyList" class="space-y-1.5 text-xs max-h-40 overflow-y-auto relative z-10 pr-1"></ul>
+    <div id="delBox" class="mt-5 pt-3 border-t border-white/10 text-right relative z-10">
+      <button onclick="deleteStu()" class="text-xs text-red-400 active:scale-95 font-bold transition-all">🗑️ Delete Student</button>
+    </div>
+  </div>
+</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* Existing Firebase project configuration from your original code. */
-const firebaseConfig = {
- apiKey: "AIzaSyC0gzobslaGZdrwNpHNAamoaAzOlX_30Cg",
- authDomain: "tuition-traker.firebaseapp.com",
- projectId: "tuition-traker",
- storageBucket: "tuition-traker.firebasestorage.app",
- messagingSenderId: "194003123154",
- appId: "1:194003123154:web:bfa0fb5a5bb394abc9260b"
-};
-const CACHE_KEY = "smartTuitionTracker_v2_cache";
-const PENDING_KEY = "smartTuitionTracker_v2_pending";
-const DOC_PATH = ["tuition_data","main_store"];
+  let audioCtx = null;
+  window.playSound = function(type) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
+      if (type === 'click') {
+        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(550, now); osc.frequency.exponentialRampToValueAtTime(180, now + 0.06);
+        gain.gain.setValueAtTime(0.15, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.06);
+        osc.start(now); osc.stop(now + 0.06);
+      } else if (type === 'success') {
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+          const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = 'triangle'; osc.frequency.setValueAtTime(f, now + i * 0.07);
+          gain.gain.setValueAtTime(0.18, now + i * 0.07); gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.35);
+          osc.start(now + i * 0.07); osc.stop(now + i * 0.07 + 0.35);
+        });
+      } else if (type === 'error') {
+        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(140, now); osc.frequency.setValueAtTime(110, now + 0.12);
+        gain.gain.setValueAtTime(0.18, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.28);
+        osc.start(now); osc.stop(now + 0.28);
+      }
+    } catch(e) {}
+  };
 
-let db = {settings:{name:"Smart Tuition",upi:""},students:[]};
-let activeStudentId = null;
-let cloudReady = false;
-let applyingCloudSnapshot = false;
-let saveQueue = Promise.resolve();
+  const firebaseConfig = {
+    apiKey: "AIzaSyC0gzobslaGZdrwNpHNAamoaAzOlX_30Cg",
+    authDomain: "tuition-traker.firebaseapp.com",
+    projectId: "tuition-traker",
+    storageBucket: "tuition-traker.firebasestorage.app",
+    messagingSenderId: "194003123154",
+    appId: "1:194003123154:web:bfa0fb5a5bb394abc9260b"
+  };
 
-const $ = id => document.getElementById(id);
-const money = n => "₹" + Math.round(Number(n)||0).toLocaleString("en-IN");
-const safe = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const todayISO = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
-function toast(message, bad=false){ $("toast").textContent=message; $("toast").style.background=bad?"#71313a":"#1c694f"; $("toast").classList.remove("hidden"); setTimeout(()=>$("toast").classList.add("hidden"),2800); }
-function setStatus(text,kind="warn"){ $("cloudStatus").textContent=text; $("cloudStatus").className="status "+kind; }
-function normalize(data){
- const out = {settings:{name:"Smart Tuition",upi:"",...(data?.settings||{})},students:Array.isArray(data?.students)?data.students:[]};
- out.students = out.students.map(s=>({...s,id:String(s.id ?? crypto.randomUUID()),name:String(s.name||"").trim(),phone:String(s.phone||""),joinDate:String(s.joinDate||todayISO()),fee:Math.max(0,Number(s.fee)||0),payments:Array.isArray(s.payments)?s.payments.map(p=>({id:String(p.id||crypto.randomUUID()),amount:Math.max(0,Number(p.amount)||0),mode:String(p.mode||"Cash"),note:String(p.note||""),time:String(p.time||new Date().toISOString())})):[]}));
- return out;
-}
-function loadLocal(){
- try { const raw=localStorage.getItem(CACHE_KEY); if(raw){db=normalize(JSON.parse(raw)); $("backupInfo").textContent="Local safety copy found on this device."; return true;} } catch(e){console.warn("Local cache could not be read",e);}
- return false;
-}
-function persistLocal(){ try{localStorage.setItem(CACHE_KEY,JSON.stringify(db)); $("backupInfo").textContent="Local safety copy updated: "+new Date().toLocaleString("en-IN");}catch(e){toast("Local storage is full or unavailable. Download a backup.",true);} }
-function monthsDue(s){
- // Fee cycle starts on joining day. A new cycle is due when today's date reaches that day.
- const start=new Date(s.joinDate+"T00:00:00");
- if(Number.isNaN(start.getTime())) return 0;
- const now=new Date();
- if(now<start) return 0;
- let months=(now.getFullYear()-start.getFullYear())*12+(now.getMonth()-start.getMonth());
- if(now.getDate()<start.getDate()) months--;
- return Math.max(1,months+1);
-}
-function totals(s){
- const billed=monthsDue(s)*Number(s.fee||0);
- const paid=(s.payments||[]).reduce((sum,p)=>sum+Number(p.amount||0),0);
- return {billed,paid,due:Math.max(0,billed-paid),credit:Math.max(0,paid-billed),months:monthsDue(s)};
-}
-function render(){
- const students=db.students||[];
- const totalPaid=students.reduce((a,s)=>a+totals(s).paid,0);
- const totalDue=students.reduce((a,s)=>a+totals(s).due,0);
- const monthly=students.reduce((a,s)=>a+Number(s.fee||0),0);
- $("totalStudents").textContent=students.length;
- $("monthlyTotal").textContent=money(monthly);
- $("totalPaid").textContent=money(totalPaid);
- $("totalDue").textContent=money(totalDue);
- $("tuitionName").value=db.settings.name||"";
- $("upiId").value=db.settings.upi||"";
- const q=$("searchBox").value.trim().toLowerCase();
- const filtered=students.filter(s=>s.name.toLowerCase().includes(q));
- $("studentList").innerHTML=filtered.length?filtered.map(s=>{
-  const t=totals(s);
-  return `<div class="student">
-   <div><h3>${safe(s.name)}</h3><div class="tiny muted">${money(s.fee)} / month · ${safe(s.phone||"No parent number")}</div></div>
-   <div class="right"><span class="pill ${t.due>0?"due":"clear"}">${t.due>0?"Due: "+money(t.due):"Fee clear"}</span><div style="margin-top:7px"><button class="secondary open-profile" data-id="${safe(s.id)}" type="button">View details</button></div></div>
-  </div>`;
- }).join(""):`<div class="empty">${students.length?"No matching students.":"No students added yet. Add your first student above."}</div>`;
- document.querySelectorAll(".open-profile").forEach(b=>b.addEventListener("click",()=>openProfile(b.dataset.id)));
-}
-function saveAll(){
- persistLocal();
- localStorage.setItem(PENDING_KEY,"1");
- if(!cloudReady){setStatus("Saved on this device · waiting for cloud","warn");return;}
- saveQueue=saveQueue.then(async()=>{
-  try{
-   await setDoc(doc(firestoreDb,...DOC_PATH),db);
-   localStorage.removeItem(PENDING_KEY);
-   setStatus("☁ Cloud synced","ok");
-  }catch(e){console.error(e);setStatus("Cloud unavailable · local copy saved","bad");}
- });
-}
-function openProfile(id){
- const s=db.students.find(x=>x.id===id); if(!s)return;
- activeStudentId=id; const t=totals(s);
- $("modalName").textContent=s.name;
- $("modalSub").textContent=`Joined ${s.joinDate} · ${t.months} fee cycle(s) billed`;
- $("mFee").textContent=money(s.fee); $("mPaid").textContent=money(t.paid); $("mDue").textContent=money(t.due);
- $("paymentHistory").innerHTML=(s.payments||[]).length?s.payments.slice().reverse().map(p=>`<div class="history"><div><b>${money(p.amount)}</b><div class="tiny muted">${safe(p.mode)}${p.note?" · "+safe(p.note):""}</div></div><span class="tiny muted">${safe(new Date(p.time).toLocaleString("en-IN"))}</span></div>`).join(""):'<div class="empty">No payment records yet.</div>';
- if(t.due>0 && db.settings.upi){
-  const params=new URLSearchParams({pa:db.settings.upi,pn:db.settings.name||"Tuition",am:String(t.due),cu:"INR",tn:`Tuition fee - ${s.name}`});
-  $("upiLink").href="upi://pay?"+params.toString(); $("upiLink").style.display="inline-flex";
- }else{$("upiLink").style.display="none";}
- $("profileModal").classList.remove("hidden");
-}
-$("studentForm").addEventListener("submit",e=>{
- e.preventDefault();
- const name=$("stuName").value.trim(),phone=$("stuPhone").value.trim(),joinDate=$("joinDate").value,fee=Number($("monthlyFee").value);
- if(!name||!joinDate||!Number.isFinite(fee)||fee<=0){toast("Please enter a name, joining date and a valid fee.",true);return;}
- db.students.push({id:crypto.randomUUID(),name,phone,joinDate,fee,payments:[]});
- $("studentForm").reset(); $("joinDate").value=todayISO(); saveAll(); render(); toast("Student saved.");
-});
-$("paymentForm").addEventListener("submit",e=>{
- e.preventDefault(); const s=db.students.find(x=>x.id===activeStudentId); if(!s)return;
- const amount=Number($("payAmount").value);
- if(!Number.isFinite(amount)||amount<=0){toast("Enter a payment amount greater than zero.",true);return;}
- s.payments=s.payments||[];
- s.payments.push({id:crypto.randomUUID(),amount,mode:$("payMode").value,note:$("payNote").value.trim(),time:new Date().toISOString()});
- $("paymentForm").reset(); saveAll(); render(); openProfile(activeStudentId); toast("Payment recorded.");
-});
-$("settingsForm").addEventListener("submit",e=>{
- e.preventDefault(); db.settings.name=$("tuitionName").value.trim()||"Smart Tuition"; db.settings.upi=$("upiId").value.trim(); saveAll(); toast("Settings saved.");
-});
-$("searchBox").addEventListener("input",render);
-$("closeModal").addEventListener("click",()=>$("profileModal").classList.add("hidden"));
-$("profileModal").addEventListener("click",e=>{if(e.target===$("profileModal"))$("profileModal").classList.add("hidden");});
-$("editBtn").addEventListener("click",()=>{
- const s=db.students.find(x=>x.id===activeStudentId);if(!s)return;
- $("editName").value=s.name;$("editPhone").value=s.phone;$("editJoin").value=s.joinDate;$("editFee").value=s.fee;
- $("editModal").classList.remove("hidden");
-});
-$("closeEdit").addEventListener("click",()=>$("editModal").classList.add("hidden"));
-$("editForm").addEventListener("submit",e=>{
- e.preventDefault();const s=db.students.find(x=>x.id===activeStudentId);if(!s)return;
- const fee=Number($("editFee").value);
- if(!$("editName").value.trim()||!$("editJoin").value||!Number.isFinite(fee)||fee<=0){toast("Please check the student details.",true);return;}
- s.name=$("editName").value.trim();s.phone=$("editPhone").value.trim();s.joinDate=$("editJoin").value;s.fee=fee;
- saveAll();render();$("editModal").classList.add("hidden");openProfile(activeStudentId);toast("Student details updated.");
-});
-$("whatsappBtn").addEventListener("click",()=>{
- const s=db.students.find(x=>x.id===activeStudentId);if(!s)return;
- if(!s.phone){toast("Add the parent's phone number first.",true);return;}
- const due=totals(s).due;
- const msg=`Namaste 🙏 ${s.name} ki pending tuition fee ${money(due)} hai. Kripya fee jama kar dein. Dhanyavaad.`;
- const digits=s.phone.replace(/\D/g,"");
- const phone=digits.length===10?"91"+digits:digits;
- window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,"_blank","noopener");
-});
-$("backupBtn").addEventListener("click",()=>{
- const pay
+  const app = initializeApp(firebaseConfig);
+  const firestoreDb = getFirestore(app);
+  const docRef = doc(firestoreDb, "tuition_data", "main_store");
+
+  let db = { settings: { name: "Smart Tuition Tracker", upi: "yourname@ybl", pin: "1234" }, students: [] };
+  let isAdmin = false, activeId = null;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const requestedStudentId = urlParams.get('student');
+
+  onSnapshot(docRef, (snap) => {
+    const statusBadge = document.getElementById('cloudStatus');
+    if (snap.exists()) {
+      db = snap.data();
+      statusBadge.innerText = "☁️ Cloud Live";
+      statusBadge.className = "text-[9px] bg-emerald-500/20 px-2 py-0.5 rounded-full text-emerald-300 border border-emerald-500/30";
+      updateUI();
+    } else {
+      setDoc(docRef, db).then(() => { statusBadge.innerText = "☁️ Synced"; });
+    }
+  }, (err) => {
+    console.error(err);
+    document.getElementById('cloudStatus').innerText = "⚠️ Offline";
+  });
+
+  function updateUI() {
+    document.getElementById('navTitle').innerText = "📚 " + (db.settings.name || "Smart Tuition");
+    document.getElementById('setTuition').value = db.settings.name || "";
+    document.getElementById('setUpi').value = db.settings.upi || "";
+    document.getElementById('setPin').value = db.settings.pin || "1234";
+
+    if (requestedStudentId && !isAdmin) {
+      let st = (db.students || []).find(x => String(x.id) === String(requestedStudentId));
+      if (st) { showPrivateStudentCard(st); return; }
+    }
+
+    document.getElementById('singleParentCard').classList.add('hidden');
+    document.getElementById('generalPortalArea').classList.remove('hidden');
+    window.renderList();
+  }
+
+  function showPrivateStudentCard(s) {
+    document.getElementById('generalPortalArea').classList.add('hidden');
+    document.getElementById('singleParentCard').classList.remove('hidden');
+    document.getElementById('modeText').classList.add('hidden');
+    document.getElementById('cloudStatus').classList.add('hidden');
+    document.getElementById('roleBtn').classList.add('hidden');
+
+    let { due } = calcFee(s);
+    document.getElementById('spName').innerText = s.name;
+    document.getElementById('spDueAmt').innerText = `₹${due}`;
+
+    let upiBtn = document.getElementById('spUpiBtn');
+    if (due > 0) {
+      upiBtn.href = `upi://pay?pa=${db.settings.upi}&pn=${encodeURIComponent(db.settings.name)}&am=${due}&cu=INR`;
+      upiBtn.innerText = `💳 Pay ₹${due} via UPI`;
+      upiBtn.classList.remove('pointer-events-none', 'opacity-50');
+    } else {
+      upiBtn.href = "#"; upiBtn.innerText = `✨ All Fees Cleared (₹0)`;
+      upiBtn.classList.add('pointer-events-none', 'opacity-90');
+    }
+
+    let h = document.getElementById('spHistory');
+    h.innerHTML = (s.payments && s.payments.length) ? s.payments.slice().reverse().map(p => 
+      `<li class="flex justify-between bg-black/25 p-2.5 rounded-xl border border-white/10"><b class="text-emerald-400 text-sm">+ ₹${p.amount}</b><span class="text-white/60">${p.time}</span></li>`
+    ).join('') : `<li class="text-white/40 italic bg-black/15 p-3 rounded-xl border border-white/5">No past payment records.</li>`;
+  }
+
+  async function saveDb() { updateUI(); try { await setDoc(docRef, db); } catch(e) {} }
+
+  function msg(t) {
+    let b = document.getElementById('msgBox');
+    b.innerText = t; b.classList.remove('hidden');
+    setTimeout(() => b.classList.add('hidden'), 2500);
+  }
+
+  window.toggleBox = function(id) { window.playSound('click'); document.getElementById(id).classList.toggle('hidden'); };
+
+  function calcFee(s) {
+    let j = new Date(s.joinDate), n = new Date();
+    let m = isNaN(j) ? 1 : (n.getFullYear() - j.getFullYear()) * 12 + (n.getMonth() - j.getMonth()) + (n.getDate() >= j.getDate() ? 1 : 0);
+    m = Math.max(1, m); let paid = (s.payments || []).reduce((a, b) => a + b.amount, 0);
+    let due = Math.max(0, (m * s.fee) - paid); return { m, paid, due };
+  }
+
+  window.renderList = function() {
+    let box = document.getElementById('studentList'), q = document.getElementById('searchBox').value.toLowerCase(); box.innerHTML = '';
+    (db.students || []).filter(s => s.name.toLowerCase().includes(q)).forEach((s, idx) => {
+      let { due } = calcFee(s);
+      let badge = due > 0 ? `<span class="bg-red-500/20 text-red-300 text-[10px] font-bold px-2.5 py-1 rounded-full border border-red-500/30">Due: ₹${due}</span>`
+                          : `<span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-500/30">Clear ₹0</span>`;
+      box.innerHTML += `
+        <div style="animation-delay: ${idx * 50}ms" onclick="openProfile(${s.id})" class="animate-card glass-card p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-white/10 active:scale-[0.98] transition-all">
+          <div><h3 class="font-bold text-white text-sm tracking-wide">${s.name}</h3><p class="text-[11px] text-white/50 mt-0.5">Fee: ₹${s.fee}/mo</p></div>
+          <div class="text-right flex flex-col items-end gap-1">${badge}<p class="text-[10px] text-blue-300 font-bold mt-0.5">Open ➔</p></div>
+        </div>`;
+    });
+  };
+
+  window.addStudent = function() {
+    let name = document.getElementById('stuName').value.trim(), phone = document.getElementById('stuPhone').value.trim();
+    let joinDate = document.getElementById('joinDate').value, fee = Number(document.getElementById('monthlyFee').value);
+    if (!name || !joinDate || !fee) { window.playSound('error'); return msg("⚠️ Please fill all details!"); }
+    db.students.push({ id: Date.now(), name, phone, joinDate, fee, payments: [] });
+    document.getElementById('stuName').value = ''; document.getElementById('stuPhone').value = ''; document.getElementById('monthlyFee').value = '';
+    window.playSound('success'); saveDb(); 
