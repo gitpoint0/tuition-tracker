@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1020">
-<title>Smart Tuition Tracker — Basic</title>
+<title>Smart Tuition Tracker</title>
 <style>
 :root{color-scheme:dark;--bg:#0b1020;--panel:#141c30;--panel2:#10182a;--line:#293650;--text:#eef3ff;--muted:#9eabc3;--blue:#477dff;--green:#20b981;--red:#f06b75;--amber:#f5b94c}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 10% 0%,#1b2d55 0,transparent 32%),radial-gradient(circle at 100% 100%,#30204c 0,transparent 30%),var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
@@ -17,7 +17,7 @@ button,.button{border:0;border-radius:11px;padding:10px 14px;font-weight:700;cur
 button.secondary,.button.secondary{background:#273650;border:1px solid #3a4a67}button.green{background:#12875f}button.danger{background:#8d3541}button:disabled{opacity:.5;cursor:not-allowed}
 input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #35445f;background:#0d1526;color:var(--text);outline:none}input:focus,select:focus{border-color:#6d9aff}
 label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field.full{grid-column:1/-1}
-.actions{display:flex;gap:8px;flex-wrap:wrap}.muted{color:var(--muted)}.tiny{font-size:12px}.status{font-size:11px;padding:5px 9px;border-radius:20px;background:#26344c;color:#c8d5ee;white-space:nowrap;cursor:pointer}.status.ok{background:#123c34;color:#8df0c8}.status.warn{background:#49391c;color:#ffda8b}.status.bad{background:#49232c;color:#ffb2ba}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.muted{color:var(--muted)}.tiny{font-size:12px}.status{font-size:11px;padding:5px 9px;border-radius:20px;background:#26344c;color:#c8d5ee;white-space:nowrap}.status.ok{background:#123c34;color:#8df0c8}.status.warn{background:#49391c;color:#ffda8b}.status.bad{background:#49232c;color:#ffb2ba}
 .search{max-width:320px}.student{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px;border:1px solid var(--line);border-radius:14px;background:#0d1628;margin-top:9px}.student h3{font-size:14px;margin:0 0 4px}.student .right{text-align:right}.pill{font-size:11px;border-radius:20px;padding:5px 8px;display:inline-block}.due{background:#49232c;color:#ffb2ba}.clear{background:#123c34;color:#8df0c8}
 .hidden{display:none!important}.modal{position:fixed;inset:0;background:#000a;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px}.modal-box{width:min(560px,100%);max-height:90vh;overflow:auto;background:#141e32;border:1px solid #3b4a65;border-radius:20px;padding:18px;box-shadow:0 25px 80px #0009}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.history{padding:9px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
 .notice{padding:11px 13px;border:1px solid #705d2f;background:#332a19;color:#ffe0a0;border-radius:12px;font-size:12px;line-height:1.5;margin-top:14px}
@@ -28,12 +28,11 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
 <body>
 <header>
  <div><h1 id="appTitle">📚 Smart Tuition Tracker</h1><small id="appSub">Basic fee management</small></div>
- <span id="cloudStatus" class="status warn" title="Tap to check connection details">Checking cloud…</span>
+ <!-- Default offline status, no more checking loop -->
+ <span id="cloudStatus" class="status warn">📱 Saved on Phone</span>
 </header>
 
 <main id="adminMain">
- <div id="cloudHelpBox" class="notice hidden" style="margin-bottom:16px"></div>
-
  <div class="grid">
   <div class="card"><div class="stat-label">Total students</div><div id="totalStudents" class="stat-value">0</div></div>
   <div class="card"><div class="stat-label">Monthly fee total</div><div id="monthlyTotal" class="stat-value">₹0</div></div>
@@ -59,14 +58,13 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
 
  <section class="panel">
   <div class="panel-head"><h2>🛟 Backup & restore</h2></div>
-  <p class="tiny muted">Download a copy of your tuition records regularly. Keep backup files somewhere safe, such as another device or a trusted cloud drive.</p>
+  <p class="tiny muted">Download a copy of your tuition records regularly. Keep backup files somewhere safe.</p>
   <div class="actions">
    <button id="backupBtn" class="secondary" type="button">⬇ Download backup</button>
    <label class="button secondary" for="restoreFile">↥ Restore backup</label>
    <input id="restoreFile" type="file" accept="application/json,.json" class="hidden">
   </div>
   <div id="backupInfo" class="tiny muted" style="margin-top:10px">Local safety copy is updated when changes are saved on this device.</div>
-  <div class="notice"><b>Important:</b> Local backup is not a substitute for cloud security. Restoring a backup replaces the current student and payment data. Only restore a file you trust.</div>
  </section>
 
  <section class="panel">
@@ -76,7 +74,6 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
    <div class="field"><label for="upiId">UPI ID</label><input id="upiId" maxlength="100" placeholder="yourname@upi"></div>
    <div class="field full"><button type="submit" class="secondary">Save settings</button></div>
   </form>
-  <p class="tiny muted" style="margin-top:10px">Student deletion is intentionally not provided on the main screen. This basic version has no delete control, to reduce accidental data loss.</p>
  </section>
  <footer>Smart Tuition Tracker • Keep a recent backup before major changes.</footer>
 </main>
@@ -123,7 +120,7 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
    </form>
   </section>
   <div class="actions" style="margin-top:12px">
-   <a id="upiLink" class="button" href="#" style="display:none">Pay pending fee via UPI</a>
+   <a id="upiLink" class="button" href="#" style="display:none">Pay pending via UPI</a>
    <button id="whatsappBtn" class="secondary" type="button">💬 WhatsApp reminder</button>
    <button id="shareLinkBtn" class="secondary" type="button">🔗 Share parent link</button>
    <button id="editBtn" class="secondary" type="button">✏️ Edit student</button>
@@ -148,25 +145,36 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
 
 <div id="toast" class="hidden" style="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1c694f;border:1px solid #47bd91;padding:11px 16px;border-radius:12px;z-index:20;box-shadow:0 10px 30px #0008"></div>
 
-<script>
-const PROJECT_ID = "tuition-traker";
-const API_KEY = "AIzaSyC0gzobslaGZdrwNpHNAamoaAzOlX_30Cg";
-const FIRESTORE_URL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/tuition_data/main_store?key=${API_KEY}`;
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+ apiKey: "AIzaSyC0gzobslaGZdrwNpHNAamoaAzOlX_30Cg",
+ authDomain: "tuition-traker.firebaseapp.com",
+ projectId: "tuition-traker",
+ storageBucket: "tuition-traker.firebasestorage.app",
+ messagingSenderId: "194003123154",
+ appId: "1:194003123154:web:bfa0fb5a5bb394abc9260b"
+};
 
 const CACHE_KEY = "smartTuitionTracker_v2_cache";
 const PENDING_KEY = "smartTuitionTracker_v2_pending";
+const DOC_PATH = ["tuition_data","main_store"];
 
 const urlParams = new URLSearchParams(window.location.search);
 const parentStudentId = urlParams.get("student");
 
 let db = {settings:{name:"Smart Tuition",upi:""},students:[]};
 let activeStudentId = null;
-let lastCloudError = "";
+let cloudReady = false;
+let firestoreDb = null;
 
 const $ = id => document.getElementById(id);
 const money = n => "₹" + Math.round(Number(n)||0).toLocaleString("en-IN");
 const safe = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const todayISO = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+const generateId = () => crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
 
 function toast(message, bad=false){
  $("toast").textContent=message;
@@ -175,32 +183,22 @@ function toast(message, bad=false){
  setTimeout(()=>$("toast").classList.add("hidden"),2800);
 }
 
-function setStatus(text,kind="warn",helpHtml=""){
+function setStatus(text,kind="warn"){
  $("cloudStatus").textContent=text;
  $("cloudStatus").className="status "+kind;
- const box = $("cloudHelpBox");
- if(box){
-  if(helpHtml){ box.innerHTML = helpHtml; box.classList.remove("hidden"); }
-  else { box.classList.add("hidden"); }
- }
 }
-
-$("cloudStatus").addEventListener("click", () => {
- if(lastCloudError) alert("Cloud Status Detail:\n" + lastCloudError);
- else syncFromCloud();
-});
 
 function normalize(data){
  const out = {settings:{name:"Smart Tuition",upi:"",...(data?.settings||{})},students:Array.isArray(data?.students)?data.students:[]};
  out.students = out.students.map(s=>({
   ...s,
-  id:String(s.id ?? (crypto.randomUUID ? crypto.randomUUID() : Date.now()+Math.random())),
+  id:String(s.id ?? generateId()),
   name:String(s.name||"").trim(),
   phone:String(s.phone||""),
   joinDate:String(s.joinDate||todayISO()),
   fee:Math.max(0,Number(s.fee)||0),
   payments:Array.isArray(s.payments)?s.payments.map(p=>({
-   id:String(p.id||(crypto.randomUUID ? crypto.randomUUID() : Date.now()+Math.random())),
+   id:String(p.id ?? generateId()),
    amount:Math.max(0,Number(p.amount)||0),
    mode:String(p.mode||"Cash"),
    note:String(p.note||""),
@@ -213,22 +211,13 @@ function normalize(data){
 function loadLocal(){
  try {
   const raw=localStorage.getItem(CACHE_KEY);
-  if(raw){
-   db=normalize(JSON.parse(raw));
-   $("backupInfo").textContent="Local safety copy found on this device.";
-   return true;
-  }
- } catch(e){ console.warn("Local cache could not be read",e); }
+  if(raw){ db=normalize(JSON.parse(raw)); return true; }
+ } catch(e){ console.warn("Cache read error",e); }
  return false;
 }
 
 function persistLocal(){
- try{
-  localStorage.setItem(CACHE_KEY,JSON.stringify(db));
-  $("backupInfo").textContent="Local safety copy updated: "+new Date().toLocaleString("en-IN");
- }catch(e){
-  toast("Local storage is full or unavailable. Download a backup.",true);
- }
+ try{ localStorage.setItem(CACHE_KEY,JSON.stringify(db)); }catch(e){}
 }
 
 function monthsDue(s){
@@ -251,7 +240,6 @@ function getParentShareUrl(s){
  const url = new URL(window.location.href);
  url.search = "";
  url.searchParams.set("student", s.id);
- // Encode compact snapshot so parent link works even if cloud isn't configured yet
  try {
   const mini = {n:db.settings.name, u:db.settings.upi, s:{id:s.id, name:s.name, joinDate:s.joinDate, fee:s.fee, payments:s.payments||[]}};
   url.searchParams.set("d", btoa(unescape(encodeURIComponent(JSON.stringify(mini)))));
@@ -278,10 +266,11 @@ function renderParentView(){
 
  $("appTitle").textContent = "📚 " + (db.settings.name || "Smart Tuition");
  $("appSub").textContent = "Parent Fee Portal";
+ $("cloudStatus").style.display = "none";
 
  if(!s){
-  $("pStudentName").textContent = "Student record not found";
-  $("pStudentSub").textContent = "Please check the link shared by your teacher.";
+  $("pStudentName").textContent = "Record not found";
+  $("pStudentSub").textContent = "Please check the link again.";
   $("pBadge").textContent = "Not found";
   $("pBadge").className = "pill due";
   return;
@@ -309,10 +298,7 @@ function renderParentView(){
 }
 
 function render(){
- if(parentStudentId){
-  renderParentView();
-  return;
- }
+ if(parentStudentId){ renderParentView(); return; }
  const students=db.students||[];
  const totalPaid=students.reduce((a,s)=>a+totals(s).paid,0);
  const totalDue=students.reduce((a,s)=>a+totals(s).due,0);
@@ -335,16 +321,28 @@ function render(){
  document.querySelectorAll(".open-profile").forEach(b=>b.addEventListener("click",()=>openProfile(b.dataset.id)));
 }
 
-/* Direct Firestore REST API Sync (Never hangs on mobile/Brave) */
-async function pushToCloud(){
- try {
-  setStatus("Syncing…","warn");
-  const body = { fields: { json: { stringValue: JSON.stringify(db) } } };
-  const res = await fetch(FIRESTORE_URL, {
-   method: "PATCH",
-   headers: { "Content-Type": "application/json" },
-   body: JSON.stringify(body)
-  });
-  if(!res.ok){
-   const errData = await res.json().catch(()=>({}));
-   handleCloud
+function saveAll(){
+ persistLocal();
+ localStorage.setItem(PENDING_KEY,"1");
+ if(!cloudReady || !firestoreDb){
+  setStatus("📱 Saved on Phone","warn");
+  return;
+ }
+ setStatus("Syncing…","warn");
+ setDoc(doc(firestoreDb,...DOC_PATH), db).then(()=>{
+  localStorage.removeItem(PENDING_KEY);
+  setStatus("☁ Cloud synced","ok");
+ }).catch(()=>{
+  setStatus("📱 Saved on Phone","warn");
+ });
+}
+
+function openProfile(id){
+ const s=db.students.find(x=>x.id===id); if(!s)return;
+ activeStudentId=id; const t=totals(s);
+ $("modalName").textContent=s.name;
+ $("modalSub").textContent=`Joined ${s.joinDate} · ${t.months} fee cycle(s) billed`;
+ $("mFee").textContent=money(s.fee); $("mPaid").textContent=money(t.paid); $("mDue").textContent=money(t.due);
+ $("paymentHistory").innerHTML=(s.payments||[]).length?s.payments.slice().reverse().map(p=>`<div class="history"><div><b>${money(p.amount)}</b><div class="tiny muted">${safe(p.mode)}${p.note?" · "+safe(p.note):""}</div></div><span class="tiny muted">${safe(new Date(p.time).toLocaleString("en-IN"))}</span></div>`).join(""):'<div class="empty">No payment records yet.</div>';
+ if(t.due>0 && db.settings.upi){
+  const params=new URLSearchParams({pa:db.settings.upi,pn:db.settings.name||"Tuition",am:String(t.due),cu:"INR",tn:`Tuition fee - ${s.name}`})
