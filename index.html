@@ -14,13 +14,12 @@ h1{font-size:18px;margin:0}header small{color:var(--muted)}main{max-width:1000px
 .stat-label{color:var(--muted);font-size:12px}.stat-value{font-size:25px;font-weight:800;margin-top:5px}
 .panel{margin-top:16px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}h2{font-size:16px;margin:0}
 button,.button{border:0;border-radius:11px;padding:10px 14px;font-weight:700;cursor:pointer;background:var(--blue);color:white;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px}
-button.secondary,.button.secondary{background:#273650;border:1px solid #3a4a67}button.green{background:#12875f}button.danger{background:#8d3541}button:disabled{opacity:.5;cursor:not-allowed}
+button.secondary,.button.secondary{background:#273650;border:1px solid #3a4a67}button.green,.button.green{background:#12875f}button.danger{background:#8d3541}button:disabled{opacity:.5;cursor:not-allowed}
 input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #35445f;background:#0d1526;color:var(--text);outline:none}input:focus,select:focus{border-color:#6d9aff}
 label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field.full{grid-column:1/-1}
 .actions{display:flex;gap:8px;flex-wrap:wrap}.muted{color:var(--muted)}.tiny{font-size:12px}.status{font-size:11px;padding:5px 9px;border-radius:20px;background:#26344c;color:#c8d5ee;white-space:nowrap}.status.ok{background:#123c34;color:#8df0c8}.status.warn{background:#49391c;color:#ffda8b}.status.bad{background:#49232c;color:#ffb2ba}
 .search{max-width:320px}.student{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px;border:1px solid var(--line);border-radius:14px;background:#0d1628;margin-top:9px}.student h3{font-size:14px;margin:0 0 4px}.student .right{text-align:right}.pill{font-size:11px;border-radius:20px;padding:5px 8px;display:inline-block}.due{background:#49232c;color:#ffb2ba}.clear{background:#123c34;color:#8df0c8}
 .hidden{display:none!important}.modal{position:fixed;inset:0;background:#000a;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px}.modal-box{width:min(560px,100%);max-height:90vh;overflow:auto;background:#141e32;border:1px solid #3b4a65;border-radius:20px;padding:18px;box-shadow:0 25px 80px #0009}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.history{padding:9px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
-.notice{padding:11px 13px;border:1px solid #705d2f;background:#332a19;color:#ffe0a0;border-radius:12px;font-size:12px;line-height:1.5;margin-top:14px}
 .empty{padding:25px;text-align:center;color:var(--muted)}footer{color:var(--muted);font-size:11px;text-align:center;margin-top:20px}
 @media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}header{align-items:flex-start}h1{font-size:16px}.student{align-items:flex-start}.student .right{min-width:100px}}
 </style>
@@ -28,8 +27,7 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
 <body>
 <header>
  <div><h1 id="appTitle">📚 Smart Tuition Tracker</h1><small id="appSub">Basic fee management</small></div>
- <!-- Default offline status, no more checking loop -->
- <span id="cloudStatus" class="status warn">📱 Saved on Phone</span>
+ <span id="cloudStatus" class="status warn">⏳ Starting...</span>
 </header>
 
 <main id="adminMain">
@@ -53,7 +51,7 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
 
  <section class="panel">
   <div class="panel-head"><h2>👨‍🎓 Students & fee status</h2><input id="searchBox" class="search" placeholder="Search by student name…"></div>
-  <div id="studentList"><div class="empty">Loading student records…</div></div>
+  <div id="studentList"><div class="empty">No students added yet.</div></div>
  </section>
 
  <section class="panel">
@@ -64,7 +62,6 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
    <label class="button secondary" for="restoreFile">↥ Restore backup</label>
    <input id="restoreFile" type="file" accept="application/json,.json" class="hidden">
   </div>
-  <div id="backupInfo" class="tiny muted" style="margin-top:10px">Local safety copy is updated when changes are saved on this device.</div>
  </section>
 
  <section class="panel">
@@ -75,7 +72,7 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
    <div class="field full"><button type="submit" class="secondary">Save settings</button></div>
   </form>
  </section>
- <footer>Smart Tuition Tracker • Keep a recent backup before major changes.</footer>
+ <footer>Smart Tuition Tracker</footer>
 </main>
 
 <!-- Parent Read-Only View -->
@@ -84,7 +81,7 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
   <div class="panel-head">
    <div>
     <h2 id="pStudentName">Student Fee Card</h2>
-    <div id="pStudentSub" class="tiny muted" style="margin-top:4px">Loading details…</div>
+    <div id="pStudentSub" class="tiny muted" style="margin-top:4px">Pending Tuition Fee</div>
    </div>
    <span id="pBadge" class="pill clear">Checking…</span>
   </div>
@@ -94,12 +91,11 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
    <div class="card"><div class="stat-label">Pending Due</div><div id="pDue" class="stat-value" style="font-size:18px;color:#ff8994">₹0</div></div>
   </div>
   <div class="actions" style="margin-top:16px">
-   <a id="pUpiLink" class="button green" href="#" style="display:none">💳 Pay pending fee via UPI</a>
+   <a id="pUpiLink" class="button green" href="#" style="display:none;width:100%;padding:14px;font-size:15px">💳 Pay pending fee via UPI</a>
   </div>
   <h2 style="margin:20px 0 8px">Payment history</h2>
-  <div id="pHistory"><div class="empty">Loading payment history…</div></div>
+  <div id="pHistory"><div class="empty">No payment records yet.</div></div>
  </section>
- <footer>Parent View • Smart Tuition Tracker</footer>
 </main>
 
 <div id="profileModal" class="modal hidden">
@@ -115,7 +111,7 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
    <form id="paymentForm" class="form-grid">
     <div class="field"><label for="payAmount">Amount (₹) *</label><input id="payAmount" type="number" min="1" step="1" required placeholder="Payment amount"></div>
     <div class="field"><label for="payMode">Payment mode</label><select id="payMode"><option>Cash</option><option>UPI</option><option>Bank transfer</option><option>Other</option></select></div>
-    <div class="field full"><label for="payNote">Note (optional)</label><input id="payNote" maxlength="120" placeholder="e.g. September fee"></div>
+    <div class="field full"><label for="payNote">Note (optional)</label><input id="payNote" maxlength="120" placeholder="e.g. October fee"></div>
     <div class="field full"><button type="submit" class="green">Add payment</button></div>
    </form>
   </section>
@@ -124,6 +120,7 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
    <button id="whatsappBtn" class="secondary" type="button">💬 WhatsApp reminder</button>
    <button id="shareLinkBtn" class="secondary" type="button">🔗 Share parent link</button>
    <button id="editBtn" class="secondary" type="button">✏️ Edit student</button>
+   <button id="deleteBtn" class="danger" type="button">🗑️ Delete</button>
   </div>
   <h2 style="margin:18px 0 8px">Payment history</h2>
   <div id="paymentHistory"></div>
@@ -145,10 +142,8 @@ label{display:block;color:#c4cee0;font-size:12px;margin:0 0 6px}.form-grid{displ
 
 <div id="toast" class="hidden" style="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1c694f;border:1px solid #47bd91;padding:11px 16px;border-radius:12px;z-index:20;box-shadow:0 10px 30px #0008"></div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+<!-- Normal Script: Runs 100% Immediately Without Blocking -->
+<script>
 const firebaseConfig = {
  apiKey: "AIzaSyC0gzobslaGZdrwNpHNAamoaAzOlX_30Cg",
  authDomain: "tuition-traker.firebaseapp.com",
@@ -167,14 +162,13 @@ const parentStudentId = urlParams.get("student");
 
 let db = {settings:{name:"Smart Tuition",upi:""},students:[]};
 let activeStudentId = null;
-let cloudReady = false;
-let firestoreDb = null;
+let cloudSyncFn = null;
 
 const $ = id => document.getElementById(id);
 const money = n => "₹" + Math.round(Number(n)||0).toLocaleString("en-IN");
 const safe = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const todayISO = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
-const generateId = () => crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
+const generateId = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now() + Math.floor(Math.random()*1000));
 
 function toast(message, bad=false){
  $("toast").textContent=message;
@@ -212,7 +206,7 @@ function loadLocal(){
  try {
   const raw=localStorage.getItem(CACHE_KEY);
   if(raw){ db=normalize(JSON.parse(raw)); return true; }
- } catch(e){ console.warn("Cache read error",e); }
+ } catch(e){}
  return false;
 }
 
@@ -222,9 +216,9 @@ function persistLocal(){
 
 function monthsDue(s){
  const start=new Date(s.joinDate+"T00:00:00");
- if(Number.isNaN(start.getTime())) return 0;
+ if(Number.isNaN(start.getTime())) return 1;
  const now=new Date();
- if(now<start) return 0;
+ if(now<start) return 1;
  let months=(now.getFullYear()-start.getFullYear())*12+(now.getMonth()-start.getMonth());
  if(now.getDate()<start.getDate()) months--;
  return Math.max(1,months+1);
@@ -233,7 +227,7 @@ function monthsDue(s){
 function totals(s){
  const billed=monthsDue(s)*Number(s.fee||0);
  const paid=(s.payments||[]).reduce((sum,p)=>sum+Number(p.amount||0),0);
- return {billed,paid,due:Math.max(0,billed-paid),credit:Math.max(0,paid-billed),months:monthsDue(s)};
+ return {billed,paid,due:Math.max(0,billed-paid),months:monthsDue(s)};
 }
 
 function getParentShareUrl(s){
@@ -250,8 +244,9 @@ function getParentShareUrl(s){
 function renderParentView(){
  $("adminMain").classList.add("hidden");
  $("parentMain").classList.remove("hidden");
+ $("cloudStatus").style.display = "none";
 
- let s = (db.students||[]).find(x => x.id === parentStudentId);
+ let s = (db.students||[]).find(x => String(x.id) === String(parentStudentId));
  const encoded = urlParams.get("d");
  if(!s && encoded){
   try {
@@ -265,19 +260,16 @@ function renderParentView(){
  }
 
  $("appTitle").textContent = "📚 " + (db.settings.name || "Smart Tuition");
- $("appSub").textContent = "Parent Fee Portal";
- $("cloudStatus").style.display = "none";
+ $("appSub").textContent = "Fee Invoice";
 
  if(!s){
-  $("pStudentName").textContent = "Record not found";
-  $("pStudentSub").textContent = "Please check the link again.";
-  $("pBadge").textContent = "Not found";
-  $("pBadge").className = "pill due";
+  $("pStudentName").textContent = "Loading student record...";
+  $("pStudentSub").textContent = "Please wait a moment.";
   return;
  }
  const t = totals(s);
  $("pStudentName").textContent = s.name;
- $("pStudentSub").textContent = `Joined ${s.joinDate} · ${t.months} fee cycle(s) billed`;
+ $("pStudentSub").textContent = `Monthly Fee: ${money(s.fee)}`;
  $("pFee").textContent = money(s.fee);
  $("pPaid").textContent = money(t.paid);
  $("pDue").textContent = money(t.due);
@@ -287,13 +279,14 @@ function renderParentView(){
  if(t.due > 0 && db.settings.upi){
   const params = new URLSearchParams({pa:db.settings.upi, pn:db.settings.name||"Tuition", am:String(t.due), cu:"INR", tn:`Tuition fee - ${s.name}`});
   $("pUpiLink").href = "upi://pay?" + params.toString();
+  $("pUpiLink").textContent = `💳 Pay Due ${money(t.due)} via UPI`;
   $("pUpiLink").style.display = "inline-flex";
  } else {
   $("pUpiLink").style.display = "none";
  }
 
  $("pHistory").innerHTML = (s.payments||[]).length
-  ? s.payments.slice().reverse().map(p=>`<div class="history"><div><b>${money(p.amount)}</b><div class="tiny muted">${safe(p.mode)}${p.note?" · "+safe(p.note):""}</div></div><span class="tiny muted">${safe(new Date(p.time).toLocaleString("en-IN"))}</span></div>`).join("")
+  ? s.payments.slice().reverse().map(p=>`<div class="history"><div><b>${money(p.amount)}</b><div class="tiny muted">${safe(p.mode)}${p.note?" · "+safe(p.note):""}</div></div><span class="tiny muted">${safe(new Date(p.time).toLocaleDateString("en-IN"))}</span></div>`).join("")
   : '<div class="empty">No payment records yet.</div>';
 }
 
@@ -314,7 +307,7 @@ function render(){
  $("studentList").innerHTML=filtered.length?filtered.map(s=>{
   const t=totals(s);
   return `<div class="student">
-   <div><h3>${safe(s.name)}</h3><div class="tiny muted">${money(s.fee)} / month · ${safe(s.phone||"No parent number")}</div></div>
+   <div><h3>${safe(s.name)}</h3><div class="tiny muted">${money(s.fee)} / month · ${safe(s.phone||"No phone")}</div></div>
    <div class="right"><span class="pill ${t.due>0?"due":"clear"}">${t.due>0?"Due: "+money(t.due):"Fee clear"}</span><div style="margin-top:7px"><button class="secondary open-profile" data-id="${safe(s.id)}" type="button">View details</button></div></div>
   </div>`;
  }).join(""):`<div class="empty">${students.length?"No matching students.":"No students added yet. Add your first student above."}</div>`;
@@ -324,25 +317,31 @@ function render(){
 function saveAll(){
  persistLocal();
  localStorage.setItem(PENDING_KEY,"1");
- if(!cloudReady || !firestoreDb){
-  setStatus("📱 Saved on Phone","warn");
-  return;
- }
- setStatus("Syncing…","warn");
- setDoc(doc(firestoreDb,...DOC_PATH), db).then(()=>{
-  localStorage.removeItem(PENDING_KEY);
-  setStatus("☁ Cloud synced","ok");
- }).catch(()=>{
-  setStatus("📱 Saved on Phone","warn");
- });
+ if(cloudSyncFn) cloudSyncFn();
+ else setStatus("📱 Saved on Phone","warn");
 }
 
 function openProfile(id){
- const s=db.students.find(x=>x.id===id); if(!s)return;
- activeStudentId=id; const t=totals(s);
+ const s=db.students.find(x=>String(x.id)===String(id)); if(!s)return;
+ activeStudentId=s.id; const t=totals(s);
  $("modalName").textContent=s.name;
- $("modalSub").textContent=`Joined ${s.joinDate} · ${t.months} fee cycle(s) billed`;
+ $("modalSub").textContent=`Monthly Fee: ${money(s.fee)}`;
  $("mFee").textContent=money(s.fee); $("mPaid").textContent=money(t.paid); $("mDue").textContent=money(t.due);
  $("paymentHistory").innerHTML=(s.payments||[]).length?s.payments.slice().reverse().map(p=>`<div class="history"><div><b>${money(p.amount)}</b><div class="tiny muted">${safe(p.mode)}${p.note?" · "+safe(p.note):""}</div></div><span class="tiny muted">${safe(new Date(p.time).toLocaleString("en-IN"))}</span></div>`).join(""):'<div class="empty">No payment records yet.</div>';
  if(t.due>0 && db.settings.upi){
-  const params=new URLSearchParams({pa:db.settings.upi,pn:db.settings.name||"Tuition",am:String(t.due),cu:"INR",tn:`Tuition fee - ${s.name}`})
+  const params=new URLSearchParams({pa:db.settings.upi,pn:db.settings.name||"Tuition",am:String(t.due),cu:"INR",tn:`Tuition fee - ${s.name}`});
+  $("upiLink").href="upi://pay?"+params.toString(); $("upiLink").style.display="inline-flex";
+ }else{$("upiLink").style.display="none";}
+ $("profileModal").classList.remove("hidden");
+}
+
+$("studentForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const name=$("stuName").value.trim(),phone=$("stuPhone").value.trim(),joinDate=$("joinDate").value,fee=Number($("monthlyFee").value);
+ if(!name||!joinDate||!Number.isFinite(fee)||fee<=0){toast("Please enter valid details.",true);return;}
+ db.students.push({id:generateId(),name,phone,joinDate,fee,payments:[]});
+ $("studentForm").reset(); $("joinDate").value=todayISO(); saveAll(); render(); toast("✅ Student saved!");
+});
+
+$("paymentForm").addEventListener("submit",e=>{
+ e.preventDefault(); const s=db.students.find(x=>String(x.id)===String(activeStuden
